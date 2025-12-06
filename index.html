@@ -1162,12 +1162,12 @@
             var origin, destination;
             if (serviceType === 'airport') {
                 var originSelect = document.querySelector('#form-airport .form-select');
-                var destSelect = document.querySelectorAll('#form-airport .form-select')[1];
+                var destSelect = document.querySelectorAll('#form-airport select')[1];
                 origin = originSelect ? originSelect.options[originSelect.selectedIndex].text : 'Aeropuerto Cancún (CUN)';
                 destination = destSelect ? destSelect.options[destSelect.selectedIndex].text : 'Playa del Carmen';
             } else {
                 var originInput = document.querySelector('#form-regional .form-input');
-                var destInput = document.querySelectorAll('#form-regional .form-input')[1];
+                var destInput = document.querySelectorAll('#form-regional input[type="text"]')[1];
                 origin = originInput && originInput.value ? originInput.value : 'Origen no especificado';
                 destination = destInput && destInput.value ? destInput.value : 'Destino no especificado';
             }
