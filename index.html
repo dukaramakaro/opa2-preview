@@ -833,31 +833,31 @@
                 <div class="quote-summary">
                     <div class="quote-row">
                         <span class="quote-label" data-es="Servicio" data-en="Service">Servicio</span>
-                        <span class="quote-value">Airport Shuttle</span>
+                        <span class="quote-value" id="quote-service">Airport Shuttle</span>
                     </div>
                     <div class="quote-row">
                         <span class="quote-label" data-es="Origen" data-en="Origin">Origen</span>
-                        <span class="quote-value">Aeropuerto Cancún (CUN)</span>
+                        <span class="quote-value" id="quote-origin">Aeropuerto Cancún (CUN)</span>
                     </div>
                     <div class="quote-row">
                         <span class="quote-label" data-es="Destino" data-en="Destination">Destino</span>
-                        <span class="quote-value">Playa del Carmen</span>
+                        <span class="quote-value" id="quote-destination">Playa del Carmen</span>
                     </div>
                     <div class="quote-row">
                         <span class="quote-label" data-es="Fecha" data-en="Date">Fecha</span>
-                        <span class="quote-value">15 Dic 2024, 2:30 PM</span>
+                        <span class="quote-value" id="quote-date">15 Dic 2024, 2:30 PM</span>
                     </div>
                     <div class="quote-row">
                         <span class="quote-label" data-es="Pasajeros" data-en="Passengers">Pasajeros</span>
-                        <span class="quote-value">4</span>
+                        <span class="quote-value" id="quote-passengers">2</span>
                     </div>
                     <div class="quote-row">
                         <span class="quote-label" data-es="Vehículo" data-en="Vehicle">Vehículo</span>
-                        <span class="quote-value">SUV / Van (OPA2 Elite)</span>
+                        <span class="quote-value" id="quote-vehicle">SUV / Van (OPA2 Elite)</span>
                     </div>
                     <div class="quote-total">
                         <span class="quote-total-label">Total</span>
-                        <span class="quote-total-value">$85 USD</span>
+                        <span class="quote-total-value" id="quote-total">$85 USD</span>
                     </div>
                 </div>
                 <button class="modal-btn primary" onclick="showModal('modal-details')" data-es="Continuar" data-en="Continue">Continuar</button>
@@ -940,7 +940,7 @@
                         <span class="quote-total-value">$85 USD</span>
                     </div>
                 </div>
-                <button class="modal-btn primary" onclick="showModal('modal-confirm')" data-es="Pagar $85 USD" data-en="Pay $85 USD">Pagar $85 USD</button>
+                <button class="modal-btn primary" onclick="showModal('modal-confirm')" id="pay-btn" data-es="Pagar $85 USD" data-en="Pay $85 USD">Pagar $85 USD</button>
                 <button class="modal-btn secondary" onclick="showModal('modal-details')" data-es="Atrás" data-en="Back">Atrás</button>
             </div>
         </div>
@@ -966,7 +966,7 @@
             <div class="modal-body">
                 <div class="confirmation-code">
                     <p class="confirmation-code-label" data-es="Número de confirmación" data-en="Confirmation number">Número de confirmación</p>
-                    <p class="confirmation-code-value">OPA2-2024-001234</p>
+                    <p class="confirmation-code-value" id="confirm-code">OPA2-2024-001234</p>
                 </div>
                 <div class="confirmation-message">
                     <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z" /></svg>
@@ -1131,10 +1131,102 @@
             document.getElementById(modalId).className = 'modal-overlay';
         }
 
-        // Form submit - show quote modal
+        // Generate random booking code
+        function generateBookingCode() {
+            var year = new Date().getFullYear();
+            var num = Math.floor(Math.random() * 900000) + 100000;
+            return 'OPA2-' + year + '-' + num;
+        }
+
+        // Calculate price based on passengers and service
+        function calculatePrice(passengers, serviceType) {
+            var basePrice = 45;
+            if (passengers > 3) basePrice = 65;
+            if (passengers > 6) basePrice = 95;
+            if (passengers > 10) basePrice = 140;
+            if (serviceType === 'elite') basePrice += 20;
+            return basePrice;
+        }
+
+        // Form submit - show quote modal with real data
         var formSubmit = document.querySelector('.form-submit');
         formSubmit.onclick = function(e) {
             e.preventDefault();
+            
+            // Get active service tab
+            var activeServiceTab = document.querySelector('.service-tab.active');
+            var serviceType = activeServiceTab ? activeServiceTab.getAttribute('data-service') : 'airport';
+            var serviceName = serviceType === 'airport' ? 'Airport Shuttle' : 'Private Transfer';
+            
+            // Get origin and destination
+            var origin, destination;
+            if (serviceType === 'airport') {
+                var originSelect = document.querySelector('#form-airport .form-select');
+                var destSelect = document.querySelectorAll('#form-airport .form-select')[1];
+                origin = originSelect ? originSelect.options[originSelect.selectedIndex].text : 'Aeropuerto Cancún (CUN)';
+                destination = destSelect ? destSelect.options[destSelect.selectedIndex].text : 'Playa del Carmen';
+            } else {
+                var originInput = document.querySelector('#form-regional .form-input');
+                var destInput = document.querySelectorAll('#form-regional .form-input')[1];
+                origin = originInput && originInput.value ? originInput.value : 'Origen no especificado';
+                destination = destInput && destInput.value ? destInput.value : 'Destino no especificado';
+            }
+            
+            // Get date and time
+            var dateInput = document.querySelector('.form-input[type="date"]');
+            var timeInput = document.querySelector('.form-input[type="time"]');
+            var dateStr = 'Fecha no especificada';
+            if (dateInput && dateInput.value) {
+                var d = new Date(dateInput.value);
+                var months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+                dateStr = d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear();
+                if (timeInput && timeInput.value) {
+                    dateStr += ', ' + timeInput.value;
+                }
+            }
+            
+            // Get service level (Estándar/Elite)
+            var serviceLevelSelect = document.querySelector('.form-select[id="service-level"]') || document.querySelectorAll('.form-select')[2];
+            var serviceLevel = 'Estándar';
+            var isElite = false;
+            if (serviceLevelSelect && serviceLevelSelect.value) {
+                serviceLevel = serviceLevelSelect.options[serviceLevelSelect.selectedIndex].text;
+                isElite = serviceLevel.indexOf('Elite') !== -1;
+            }
+            
+            // Get vehicle based on passengers
+            var vehicle = 'Sedán';
+            if (passengers > 3) vehicle = 'SUV / Van';
+            if (passengers > 10) vehicle = 'Sprinter';
+            vehicle += ' (' + serviceLevel + ')';
+            
+            // Calculate price
+            var price = calculatePrice(passengers, isElite ? 'elite' : 'standard');
+            
+            // Check if round trip
+            var activeFormTab = document.querySelector('.form-tab.active');
+            var isRoundTrip = activeFormTab && activeFormTab.innerText.indexOf('Redondo') !== -1;
+            if (isRoundTrip) {
+                price = Math.round(price * 1.8); // 10% discount for round trip
+            }
+            
+            // Update modal with real data
+            document.getElementById('quote-service').innerText = serviceName + (isRoundTrip ? ' (Redondo)' : ' (Ida)');
+            document.getElementById('quote-origin').innerText = origin;
+            document.getElementById('quote-destination').innerText = destination;
+            document.getElementById('quote-date').innerText = dateStr;
+            document.getElementById('quote-passengers').innerText = passengers;
+            document.getElementById('quote-vehicle').innerText = vehicle;
+            document.getElementById('quote-total').innerText = '$' + price + ' USD';
+            
+            // Update pay button
+            var payBtn = document.getElementById('pay-btn');
+            payBtn.innerText = (currentLang === 'es' ? 'Pagar $' : 'Pay $') + price + ' USD';
+            
+            // Generate booking code for confirmation
+            var bookingCode = generateBookingCode();
+            document.getElementById('confirm-code').innerText = bookingCode;
+            
             showModal('modal-quote');
         };
 
