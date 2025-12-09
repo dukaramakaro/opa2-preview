@@ -37,7 +37,7 @@
         /* HERO */
         .hero {
             min-height: 100vh; display: grid; grid-template-columns: 1.1fr 0.9fr;
-            background: linear-gradient(135deg, #fff 0%, var(--opa2-cream) 100%);
+            background: linear-gradient(135deg, rgba(255,255,255,0.65) 0%, rgba(245,245,243,0.7) 100%), url('img/hero.png') left center/cover no-repeat;
             padding-top: 110px;
         }
         .hero-content { display: flex; flex-direction: column; justify-content: center; padding: 40px 40px 60px 60px; }
@@ -302,12 +302,20 @@
         /* RESPONSIVE */
         @media (max-width: 900px) {
             .hero { grid-template-columns: 1fr; }
+            .hero-content { text-align: center; padding: 40px 30px; align-items: center; }
+            .hero-badge { margin: 0 auto 28px; }
+            .hero-subtitle { margin: 0 auto 44px; }
+            .hero-features { justify-content: center; }
+            .hero-stats { justify-content: center; }
+            .hero-form-container { padding: 20px 30px 60px; }
+            .booking-form { margin: 0 auto; }
             .servicios-grid { grid-template-columns: 1fr; }
             .destinos-grid { grid-template-columns: repeat(2, 1fr); }
             .flota-grid { grid-template-columns: repeat(2, 1fr); }
             .why-grid { grid-template-columns: repeat(2, 1fr); }
             .footer-grid { grid-template-columns: repeat(2, 1fr); }
             section { padding: 60px 40px; }
+            .section-title, .section-subtitle { text-align: center; }
             .booking-details { grid-template-columns: 1fr; }
             .booking-timeline { flex-wrap: wrap; gap: 20px; }
             .booking-timeline::before { display: none; }
@@ -319,14 +327,18 @@
             .nav-links > a:not(.nav-lang a) { display: none; }
             .destinos-grid, .flota-grid, .why-grid { grid-template-columns: 1fr; }
             .hero-title { font-size: 32px; }
+            .hero-content { padding: 30px 20px; }
+            .hero-form-container { padding: 10px 20px 50px; }
             .section-title { font-size: 28px; }
-            .footer-grid { grid-template-columns: 1fr; }
-            .hero-features { flex-direction: column; gap: 20px; }
-            .hero-stats { flex-direction: column; gap: 20px; }
+            .footer-grid { grid-template-columns: 1fr; text-align: center; }
+            .footer-logo { text-align: center; }
+            .hero-features { flex-direction: column; gap: 20px; align-items: center; }
+            .hero-stats { flex-direction: column; gap: 20px; align-items: center; }
             .track-search { flex-direction: column; }
-            .booking-header { flex-direction: column; gap: 16px; align-items: flex-start; }
+            .booking-header { flex-direction: column; gap: 16px; align-items: center; text-align: center; }
             .booking-actions { flex-direction: column; }
             .timeline-step { flex: 0 0 100%; }
+            section { padding: 50px 20px; }
         }
     </style>
 </head>
@@ -531,7 +543,7 @@
         </div>
         <div class="flota-grid">
             <div class="flota-card">
-                <div class="flota-img"><img src="https://images.pexels.com/photos/170811/pexels-photo-170811.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Sedán Ejecutivo"></div>
+                <div class="flota-img"><img src="img/sedan.png" alt="Sedán Ejecutivo"></div>
                 <div class="flota-content">
                     <p class="flota-type" data-es="Estándar" data-en="Standard">Estándar</p>
                     <h3 class="flota-name" data-es="Sedán Ejecutivo" data-en="Executive Sedan">Sedán Ejecutivo</h3>
@@ -542,7 +554,7 @@
                 </div>
             </div>
             <div class="flota-card">
-                <div class="flota-img"><img src="https://images.pexels.com/photos/116675/pexels-photo-116675.jpeg?auto=compress&cs=tinysrgb&w=600" alt="SUV Premium"></div>
+                <div class="flota-img"><img src="img/suv.png" alt="SUV Premium"></div>
                 <div class="flota-content">
                     <p class="flota-type">OPA2 Elite</p>
                     <h3 class="flota-name">SUV / Van</h3>
@@ -553,7 +565,7 @@
                 </div>
             </div>
             <div class="flota-card">
-                <div class="flota-img"><img src="https://images.pexels.com/photos/2676096/pexels-photo-2676096.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Sprinter"></div>
+                <div class="flota-img"><img src="img/sprinter.png" alt="Sprinter"></div>
                 <div class="flota-content">
                     <p class="flota-type" data-es="Grupos" data-en="Groups">Grupos</p>
                     <h3 class="flota-name">Sprinter</h3>
@@ -1162,12 +1174,12 @@
             var origin, destination;
             if (serviceType === 'airport') {
                 var originSelect = document.querySelector('#form-airport .form-select');
-                var destSelect = document.querySelectorAll('#form-airport select')[1];
+                var destSelect = document.querySelectorAll('#form-airport .form-select')[1];
                 origin = originSelect ? originSelect.options[originSelect.selectedIndex].text : 'Aeropuerto Cancún (CUN)';
                 destination = destSelect ? destSelect.options[destSelect.selectedIndex].text : 'Playa del Carmen';
             } else {
                 var originInput = document.querySelector('#form-regional .form-input');
-                var destInput = document.querySelectorAll('#form-regional input[type="text"]')[1];
+                var destInput = document.querySelectorAll('#form-regional .form-input')[1];
                 origin = originInput && originInput.value ? originInput.value : 'Origen no especificado';
                 destination = destInput && destInput.value ? destInput.value : 'Destino no especificado';
             }
