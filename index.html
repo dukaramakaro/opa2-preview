@@ -1725,24 +1725,8 @@
             var isLuxury = lastSelect && lastSelect.value === 'elite';
             var serviceLevel = isLuxury ? 'Luxury' : 'Estándar';
             
-            // Calcular precio real - usar zona del hotel si está disponible
-            var resultado;
-            var hotelZoneInput = document.getElementById('hotel-zone');
-            var hotelZoneInfo = null;
-            
-            if (hotelZoneInput && hotelZoneInput.value) {
-                try {
-                    hotelZoneInfo = JSON.parse(hotelZoneInput.value);
-                } catch(e) {}
-            }
-            
-            if (hotelZoneInfo && hotelZoneInfo.base) {
-                // Usar precio con zona del hotel
-                resultado = calcularPrecioConZona(origen, hotelZoneInfo, passengers, isLuxury);
-            } else {
-                // Usar precio directo del tabulador
-                resultado = calcularPrecioReal(origen, destino, passengers, isLuxury);
-            }
+            // Calcular precio - siempre usar dropdown de destino
+            var resultado = calcularPrecioReal(origen, destino, passengers, isLuxury);
             
             if (!resultado) {
                 // No hay precio en tabulador - enviar a WhatsApp
