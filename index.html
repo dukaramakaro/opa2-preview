@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>OPA2 - Transportación Premium Riviera Maya</title>
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- EmailJS SDK -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
@@ -866,9 +868,8 @@
                     <div class="progress-dot active"></div>
                     <div class="progress-dot"></div>
                     <div class="progress-dot"></div>
-                    <div class="progress-dot"></div>
                 </div>
-                <p class="modal-step" data-es="Paso 1 de 4" data-en="Step 1 of 4">Paso 1 de 4</p>
+                <p class="modal-step" data-es="Paso 1 de 3" data-en="Step 1 of 3">Paso 1 de 3</p>
                 <h3 class="modal-title" data-es="Tu cotización" data-en="Your quote">Tu cotización</h3>
                 <p class="modal-subtitle" data-es="Revisa los detalles de tu traslado" data-en="Review your transfer details">Revisa los detalles de tu traslado</p>
             </div>
@@ -918,36 +919,39 @@
                     <div class="progress-dot done"></div>
                     <div class="progress-dot active"></div>
                     <div class="progress-dot"></div>
-                    <div class="progress-dot"></div>
                 </div>
-                <p class="modal-step" data-es="Paso 2 de 4" data-en="Step 2 of 4">Paso 2 de 4</p>
+                <p class="modal-step" data-es="Paso 2 de 3" data-en="Step 2 of 3">Paso 2 de 3</p>
                 <h3 class="modal-title" data-es="Tus datos" data-en="Your details">Tus datos</h3>
                 <p class="modal-subtitle" data-es="Información de contacto" data-en="Contact information">Información de contacto</p>
             </div>
             <div class="modal-body">
                 <div class="form-group">
                     <label class="form-label" data-es="Nombre completo" data-en="Full name">Nombre completo</label>
-                    <input type="text" class="form-input" placeholder="John Smith" value="John Smith">
+                    <input type="text" class="form-input" id="client-name" placeholder="Tu nombre completo" required>
                 </div>
                 <div class="form-group">
                     <label class="form-label">Email</label>
-                    <input type="email" class="form-input" placeholder="john@email.com" value="john@email.com">
+                    <input type="email" class="form-input" id="client-email" placeholder="tu@email.com" required>
                 </div>
                 <div class="form-group">
                     <label class="form-label" data-es="Teléfono / WhatsApp" data-en="Phone / WhatsApp">Teléfono / WhatsApp</label>
-                    <input type="tel" class="form-input" placeholder="+1 555 123 4567" value="+1 555 123 4567">
+                    <input type="tel" class="form-input" id="client-phone" placeholder="+52 984 123 4567" required>
                 </div>
                 <div class="form-group">
                     <label class="form-label" data-es="Número de vuelo (opcional)" data-en="Flight number (optional)">Número de vuelo (opcional)</label>
-                    <input type="text" class="form-input" placeholder="AA 1234" value="AA 1234">
+                    <input type="text" class="form-input" id="client-flight" placeholder="AA 1234">
                 </div>
-                <button class="modal-btn primary" onclick="showModal('modal-payment')" data-es="Continuar al pago" data-en="Continue to payment">Continuar al pago</button>
+                <div class="form-group">
+                    <label class="form-label" data-es="Notas adicionales (opcional)" data-en="Additional notes (optional)">Notas adicionales (opcional)</label>
+                    <textarea class="form-input" id="client-notes" placeholder="Sillas para niños, equipaje extra, etc." rows="2" style="resize: none;"></textarea>
+                </div>
+                <button class="modal-btn primary" onclick="submitReservation()" data-es="Enviar solicitud" data-en="Submit request">Enviar solicitud</button>
                 <button class="modal-btn secondary" onclick="showModal('modal-quote')" data-es="Atrás" data-en="Back">Atrás</button>
             </div>
         </div>
     </div>
 
-    <!-- MODAL: Paso 3 - Pago -->
+    <!-- MODAL: Pago (PRÓXIMAMENTE - Stripe) - Descomentar cuando se integre Stripe
     <div class="modal-overlay" id="modal-payment">
         <div class="modal">
             <button class="modal-close" onclick="closeModal('modal-payment')">&times;</button>
@@ -988,8 +992,9 @@
             </div>
         </div>
     </div>
+    -->
 
-    <!-- MODAL: Paso 4 - Confirmación -->
+    <!-- MODAL: Paso 3 - Confirmación -->
     <div class="modal-overlay" id="modal-confirm">
         <div class="modal">
             <button class="modal-close" onclick="closeModal('modal-confirm')">&times;</button>
@@ -998,25 +1003,30 @@
                     <div class="progress-dot done"></div>
                     <div class="progress-dot done"></div>
                     <div class="progress-dot done"></div>
-                    <div class="progress-dot done"></div>
                 </div>
                 <div class="confirmation-icon">
                     <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
                 </div>
-                <h3 class="modal-title" data-es="¡Reservación confirmada!" data-en="Booking confirmed!">¡Reservación confirmada!</h3>
-                <p class="modal-subtitle" data-es="Tu traslado está listo" data-en="Your transfer is ready">Tu traslado está listo</p>
+                <h3 class="modal-title" data-es="¡Solicitud enviada!" data-en="Request sent!">¡Solicitud enviada!</h3>
+                <p class="modal-subtitle" data-es="Hemos recibido tu reservación" data-en="We have received your booking">Hemos recibido tu reservación</p>
             </div>
             <div class="modal-body">
                 <div class="confirmation-code">
-                    <p class="confirmation-code-label" data-es="Número de confirmación" data-en="Confirmation number">Número de confirmación</p>
+                    <p class="confirmation-code-label" data-es="Número de referencia" data-en="Reference number">Número de referencia</p>
                     <p class="confirmation-code-value" id="confirm-code">OPA2-2024-001234</p>
                 </div>
                 <div class="confirmation-message">
-                    <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z" /></svg>
-                    <p data-es="Recibirás un WhatsApp con los detalles de tu conductor 24 horas antes de tu viaje." data-en="You'll receive a WhatsApp with your driver's details 24 hours before your trip.">Recibirás un WhatsApp con los detalles de tu conductor 24 horas antes de tu viaje.</p>
+                    <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" /></svg>
+                    <p data-es="Te contactaremos pronto para confirmar tu reservación y coordinar los detalles." data-en="We will contact you soon to confirm your booking and coordinate the details.">Te contactaremos pronto para confirmar tu reservación y coordinar los detalles.</p>
+                </div>
+                <div class="confirmation-contact" style="margin-top: 16px; padding: 16px; background: rgba(0,166,153,0.1); border-radius: 12px; text-align: center;">
+                    <p style="font-size: 13px; color: #666; margin-bottom: 8px;" data-es="¿Preguntas? Escríbenos:" data-en="Questions? Contact us:">¿Preguntas? Escríbenos:</p>
+                    <a href="https://wa.me/529842160298" target="_blank" style="display: inline-flex; align-items: center; gap: 8px; color: #00a699; text-decoration: none; font-weight: 600;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                        +52 984 216 0298
+                    </a>
                 </div>
                 <button class="modal-btn primary" onclick="closeModal('modal-confirm')" data-es="Listo" data-en="Done">Listo</button>
-                <button class="modal-btn secondary" onclick="window.print()" data-es="Imprimir comprobante" data-en="Print receipt">Imprimir comprobante</button>
             </div>
         </div>
     </div>
@@ -1779,6 +1789,155 @@
                     this.className = 'modal-overlay';
                 }
             };
+        }
+
+        // ==========================================
+        // ENVÍO DE RESERVACIÓN (Email + WhatsApp)
+        // ==========================================
+        
+        // Inicializar EmailJS (se configura después)
+        // emailjs.init('YOUR_PUBLIC_KEY'); // <- Configurar después
+        
+        // Variable global para guardar datos de cotización
+        var reservationData = {};
+        
+        // Guardar datos cuando se muestra la cotización
+        var originalShowModal = showModal;
+        showModal = function(modalId) {
+            if (modalId === 'modal-quote') {
+                // Guardar datos de la cotización
+                reservationData = {
+                    servicio: document.getElementById('quote-service').innerText,
+                    origen: document.getElementById('quote-origin').innerText,
+                    destino: document.getElementById('quote-destination').innerText,
+                    fecha: document.getElementById('quote-date').innerText,
+                    pasajeros: document.getElementById('quote-passengers').innerText,
+                    vehiculo: document.getElementById('quote-vehicle').innerText,
+                    total: document.getElementById('quote-total').innerText,
+                    codigo: document.getElementById('confirm-code').innerText
+                };
+            }
+            originalShowModal(modalId);
+        };
+        
+        function submitReservation() {
+            // Validar campos
+            var name = document.getElementById('client-name').value.trim();
+            var email = document.getElementById('client-email').value.trim();
+            var phone = document.getElementById('client-phone').value.trim();
+            var flight = document.getElementById('client-flight').value.trim();
+            var notes = document.getElementById('client-notes').value.trim();
+            
+            if (!name || !email || !phone) {
+                alert(currentLang === 'es' ? 'Por favor completa nombre, email y teléfono' : 'Please fill in name, email and phone');
+                return;
+            }
+            
+            // Validar email básico
+            if (!email.includes('@') || !email.includes('.')) {
+                alert(currentLang === 'es' ? 'Por favor ingresa un email válido' : 'Please enter a valid email');
+                return;
+            }
+            
+            // Preparar datos completos
+            var fullData = {
+                // Datos del cliente
+                nombre: name,
+                email: email,
+                telefono: phone,
+                vuelo: flight || 'No especificado',
+                notas: notes || 'Sin notas',
+                // Datos de la reservación
+                codigo: reservationData.codigo,
+                servicio: reservationData.servicio,
+                origen: reservationData.origen,
+                destino: reservationData.destino,
+                fecha: reservationData.fecha,
+                pasajeros: reservationData.pasajeros,
+                vehiculo: reservationData.vehiculo,
+                total: reservationData.total,
+                // Metadata
+                idioma: currentLang,
+                fechaSolicitud: new Date().toLocaleString('es-MX')
+            };
+            
+            // Mostrar loading
+            var submitBtn = document.querySelector('#modal-details .modal-btn.primary');
+            var originalText = submitBtn.innerText;
+            submitBtn.innerText = currentLang === 'es' ? 'Enviando...' : 'Sending...';
+            submitBtn.disabled = true;
+            
+            // Enviar por EmailJS (si está configurado) + WhatsApp como respaldo
+            sendReservationEmail(fullData, function(success) {
+                submitBtn.innerText = originalText;
+                submitBtn.disabled = false;
+                
+                if (success) {
+                    showModal('modal-confirm');
+                } else {
+                    // Fallback: Abrir WhatsApp
+                    var whatsappMsg = generarMensajeWhatsApp(fullData);
+                    window.open('https://wa.me/529842160298?text=' + encodeURIComponent(whatsappMsg), '_blank');
+                    showModal('modal-confirm');
+                }
+            });
+        }
+        
+        function sendReservationEmail(data, callback) {
+            // Verificar si EmailJS está configurado
+            if (typeof emailjs === 'undefined' || !window.EMAILJS_CONFIGURED) {
+                console.log('EmailJS no configurado, usando WhatsApp');
+                callback(false);
+                return;
+            }
+            
+            // Enviar email con EmailJS
+            emailjs.send('service_opa2', 'template_reserva', {
+                to_email: 'soporteopa2@gmail.com',
+                from_name: data.nombre,
+                from_email: data.email,
+                phone: data.telefono,
+                flight: data.vuelo,
+                notes: data.notas,
+                booking_code: data.codigo,
+                service: data.servicio,
+                origin: data.origen,
+                destination: data.destino,
+                date: data.fecha,
+                passengers: data.pasajeros,
+                vehicle: data.vehiculo,
+                total: data.total,
+                language: data.idioma,
+                request_date: data.fechaSolicitud
+            }).then(function() {
+                console.log('Email enviado exitosamente');
+                callback(true);
+            }).catch(function(error) {
+                console.log('Error enviando email:', error);
+                callback(false);
+            });
+        }
+        
+        function generarMensajeWhatsApp(data) {
+            var msg = '🚐 *NUEVA RESERVACIÓN OPA2*\n\n';
+            msg += '📋 *Código:* ' + data.codigo + '\n';
+            msg += '━━━━━━━━━━━━━━━━\n\n';
+            msg += '👤 *CLIENTE*\n';
+            msg += 'Nombre: ' + data.nombre + '\n';
+            msg += 'Email: ' + data.email + '\n';
+            msg += 'Teléfono: ' + data.telefono + '\n';
+            msg += 'Vuelo: ' + data.vuelo + '\n';
+            msg += 'Notas: ' + data.notas + '\n\n';
+            msg += '🚗 *SERVICIO*\n';
+            msg += 'Tipo: ' + data.servicio + '\n';
+            msg += 'Origen: ' + data.origen + '\n';
+            msg += 'Destino: ' + data.destino + '\n';
+            msg += 'Fecha: ' + data.fecha + '\n';
+            msg += 'Pasajeros: ' + data.pasajeros + '\n';
+            msg += 'Vehículo: ' + data.vehiculo + '\n\n';
+            msg += '💰 *Total:* ' + data.total + '\n\n';
+            msg += '📅 Solicitud: ' + data.fechaSolicitud;
+            return msg;
         }
     </script>
 </body>
