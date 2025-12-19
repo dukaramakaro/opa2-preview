@@ -88,6 +88,15 @@
         .form-input, .form-select { width: 100%; padding: 14px 16px; background: var(--opa2-cream); border: 1px solid transparent; border-radius: 10px; font-family: 'Sora', sans-serif; font-size: 14px; transition: all 0.3s; }
         .form-input:focus, .form-select:focus { outline: none; border-color: var(--opa2-red); background: white; }
         .form-select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill='none' stroke='%236b6b6b' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; cursor: pointer; }
+        
+        /* Hotel Search Suggestions */
+        .hotel-suggestions { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid rgba(0,0,0,0.1); border-radius: 10px; max-height: 200px; overflow-y: auto; z-index: 100; display: none; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .hotel-suggestions.active { display: block; }
+        .hotel-suggestion { padding: 12px 16px; cursor: pointer; font-size: 14px; border-bottom: 1px solid rgba(0,0,0,0.05); transition: background 0.2s; }
+        .hotel-suggestion:last-child { border-bottom: none; }
+        .hotel-suggestion:hover { background: var(--opa2-cream); }
+        .hotel-suggestion-name { font-weight: 600; color: var(--opa2-black); }
+        .hotel-suggestion-address { font-size: 12px; color: var(--opa2-gray); margin-top: 2px; }
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
         .passenger-counter { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: var(--opa2-cream); border-radius: 10px; }
         .counter-controls { display: flex; align-items: center; gap: 14px; }
@@ -326,7 +335,7 @@
             .nav-logo img { height: 60px; }
             .nav-links > a:not(.nav-lang a) { display: none; }
             .destinos-grid, .flota-grid, .why-grid { grid-template-columns: 1fr; }
-            .hero { background-position: center 25%; background-size: 100% auto; }
+            .hero { background-position: center 20%; background-size: 100% auto; }
             .hero-title { font-size: 32px; }
             .hero-content { padding: 30px 20px; }
             .hero-form-container { padding: 10px 20px 50px; }
@@ -418,42 +427,63 @@
                 <div id="form-airport" class="form-content active">
                     <div class="form-group">
                         <label class="form-label" data-es="Origen" data-en="Origin">Origen</label>
-                        <select class="form-select">
+                        <select class="form-select" id="airport-origin" onchange="updateDestinations()">
                             <option value="" data-es="Selecciona origen" data-en="Select origin">Selecciona origen</option>
-                            <option value="cun">Aeropuerto de Cancún (CUN)</option>
-                            <option value="tqo">Aeropuerto de Tulum (TQO)</option>
-                            <option value="other" data-es="Hotel / Dirección" data-en="Hotel / Address">Hotel / Dirección</option>
+                            <option value="CUN">Aeropuerto de Cancún (CUN)</option>
+                            <option value="TQO">Aeropuerto de Tulum (TQO)</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label class="form-label" data-es="Destino" data-en="Destination">Destino</label>
-                        <select class="form-select">
-                            <option value="" data-es="Selecciona destino" data-en="Select destination">Selecciona destino</option>
-                            <option value="playa">Playa del Carmen</option>
-                            <option value="tulum">Tulum</option>
-                            <option value="cancun-zh">Cancún Zona Hotelera</option>
-                            <option value="puerto-morelos">Puerto Morelos</option>
-                            <option value="puerto-aventuras">Puerto Aventuras</option>
-                            <option value="akumal">Akumal</option>
+                        <label class="form-label" data-es="Zona de destino" data-en="Destination zone">Zona de destino</label>
+                        <select class="form-select" id="airport-destination" onchange="toggleHotelSearch()">
+                            <option value="" data-es="Selecciona zona" data-en="Select zone">Selecciona zona</option>
                         </select>
+                    </div>
+                    <div class="form-group" id="hotel-search-container" style="display: none;">
+                        <label class="form-label" data-es="Tu hotel" data-en="Your hotel">Tu hotel</label>
+                        <div style="position: relative;">
+                            <input type="text" class="form-input" id="hotel-search" placeholder="Escribe el nombre de tu hotel..." data-es-placeholder="Escribe el nombre de tu hotel..." data-en-placeholder="Type your hotel name..." autocomplete="off">
+                            <div id="hotel-suggestions" class="hotel-suggestions"></div>
+                        </div>
+                        <input type="hidden" id="hotel-zone" value="">
+                        <div id="hotel-zone-display" style="display: none; margin-top: 8px; padding: 8px 12px; background: rgba(0,166,153,0.1); border-radius: 8px; font-size: 14px; color: #00a699;">
+                            <span id="zone-text"></span>
+                        </div>
                     </div>
                 </div>
                 
-                <!-- Private Transfer Form -->
+                <!-- Private Transfer Form (Traslados regionales) -->
                 <div id="form-regional" class="form-content">
                     <div class="form-group">
                         <label class="form-label" data-es="Origen" data-en="Origin">Origen</label>
-                        <input type="text" class="form-input" placeholder="Hotel, dirección, aeropuerto..." data-es-placeholder="Hotel, dirección, aeropuerto..." data-en-placeholder="Hotel, address, airport...">
+                        <select class="form-select" id="regional-origin" onchange="updateRegionalDestinations()">
+                            <option value="" data-es="Selecciona origen" data-en="Select origin">Selecciona origen</option>
+                            <option value="PDC">Playa del Carmen</option>
+                            <option value="CANCUN">Cancún</option>
+                            <option value="TULUM">Tulum</option>
+                        </select>
                     </div>
                     <div class="form-group">
                         <label class="form-label" data-es="Destino" data-en="Destination">Destino</label>
-                        <input type="text" class="form-input" placeholder="Hotel, dirección, ciudad..." data-es-placeholder="Hotel, dirección, ciudad..." data-en-placeholder="Hotel, address, city...">
+                        <select class="form-select" id="regional-destination">
+                            <option value="" data-es="Selecciona destino" data-en="Select destination">Selecciona destino</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="margin-top: 12px;">
+                        <a href="#" id="whatsapp-custom" class="whatsapp-link" style="display: flex; align-items: center; gap: 8px; color: var(--opa2-gray); font-size: 13px; text-decoration: none;">
+                            <svg style="width:16px;height:16px;" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                            <span data-es="¿No encuentras tu destino? Solicitar cotización" data-en="Can't find your destination? Request quote">¿No encuentras tu destino? Solicitar cotización</span>
+                        </a>
                     </div>
                 </div>
 
                 <div class="form-row">
-                    <div class="form-group"><label class="form-label" data-es="Fecha" data-en="Date">Fecha</label><input type="date" class="form-input"></div>
-                    <div class="form-group"><label class="form-label" data-es="Hora" data-en="Time">Hora</label><input type="time" class="form-input"></div>
+                    <div class="form-group"><label class="form-label" data-es="Fecha" data-en="Date">Fecha</label><input type="date" class="form-input" id="fecha-ida"></div>
+                    <div class="form-group"><label class="form-label" data-es="Hora" data-en="Time">Hora</label><input type="time" class="form-input" id="hora-ida"></div>
+                </div>
+                <div class="form-row" id="return-fields" style="display: none;">
+                    <div class="form-group"><label class="form-label" data-es="Fecha retorno" data-en="Return date">Fecha retorno</label><input type="date" class="form-input" id="fecha-retorno"></div>
+                    <div class="form-group"><label class="form-label" data-es="Hora retorno" data-en="Return time">Hora retorno</label><input type="time" class="form-input" id="hora-retorno"></div>
                 </div>
                 <div class="form-group">
                     <label class="form-label" data-es="Pasajeros" data-en="Passengers">Pasajeros</label>
@@ -470,7 +500,7 @@
                     <label class="form-label" data-es="Tipo de servicio" data-en="Service type">Tipo de servicio</label>
                     <select class="form-select">
                         <option value="standard" data-es="Estándar" data-en="Standard">Estándar</option>
-                        <option value="elite">OPA2 Elite</option>
+                        <option value="elite">Luxury</option>
                     </select>
                 </div>
                 <button type="submit" class="form-submit" data-es="Obtener cotización" data-en="Get quote">Obtener cotización</button>
@@ -950,7 +980,7 @@
                 <div class="quote-summary" style="background: white; border: 1px solid rgba(0,0,0,0.1);">
                     <div class="quote-total" style="border-top: none; padding-top: 0; margin-top: 0;">
                         <span class="quote-total-label" data-es="Total a pagar" data-en="Total to pay">Total a pagar</span>
-                        <span class="quote-total-value">$85 USD</span>
+                        <span class="quote-total-value" id="payment-total">$85 USD</span>
                     </div>
                 </div>
                 <button class="modal-btn primary" onclick="showModal('modal-confirm')" id="pay-btn" data-es="Pagar $85 USD" data-en="Pay $85 USD">Pagar $85 USD</button>
@@ -1097,6 +1127,449 @@
             })(i);
         }
 
+        // ==========================================
+        // BASE DE DATOS DE HOTELES - RIVIERA MAYA (307 hoteles)
+        // ==========================================
+        var HOTELES_DB = {
+            'CANCUN_ZH': {
+                nombre: 'Zona Hotelera Cancún',
+                precioBase: 'ZH_CANCUN',
+                multiplicador: 1.0,
+                hoteles: ['Le Blanc Spa Resort Cancun','Live Aqua Cancun','Secrets The Vine Cancun','Hyatt Ziva Cancun','Hyatt Zilara Cancun','Grand Fiesta Americana Coral Beach','JW Marriott Cancun Resort & Spa','The Ritz-Carlton Cancun','Marriott Cancun Resort','Westin Resort & Spa Cancun','Kempinski Hotel Cancun','Presidente InterContinental Cancun','Paradisus Cancun','ME Cancun','Hard Rock Hotel Cancun','Riu Palace Las Americas','Riu Palace Peninsula','Riu Cancun','Hotel Riu Palace Cancun','Krystal Cancun','Krystal Grand Cancun','Grand Oasis Cancun','Grand Oasis Palm','Oasis Palm','Oasis Cancun Lite','The Sens Cancun','Grand Park Royal Cancun','Park Royal Beach Cancun','Fiesta Americana Condesa Cancun','GR Solaris Cancun','Flamingo Cancun','NYX Hotel Cancun','Royalton CHIC Cancun','Planet Hollywood Cancun','Dreams Cancun Resort & Spa','Now Emerald Cancun','Emporio Cancun','Sandos Cancun','Beach Palace Cancun','Sun Palace Cancun','Cancun Bay Hotel','Casa Maya Cancun','Golden Parnassus Resort & Spa','Iberostar Selection Cancun','Nizuc Resort & Spa','Moon Palace The Grand Cancun','Melody Maker Cancun','Temptation Cancun Resort','Wyndham Garden Cancun Downtown','Aloft Cancun','Courtyard by Marriott Cancun','Hilton Cancun Mar Caribe','InterContinental Presidente Cancun','Omni Cancun Hotel & Villas','Panama Jack Resorts Cancun','Royal Solaris Cancun','Seadust Cancun Family Resort','Solymar Beach Resort','Sunset Marina Resort & Yacht Club','Villa del Palmar Cancun','Wyndham Alltra Cancun']
+            },
+            'COSTA_MUJERES': {
+                nombre: 'Costa Mujeres / Playa Mujeres',
+                precioBase: 'COSTA_MUJERES',
+                multiplicador: 1.0,
+                hoteles: ['Atelier Playa Mujeres','Excellence Playa Mujeres','Excellence Coral Playa Mujeres','Finest Playa Mujeres','Beloved Playa Mujeres','Secrets Playa Mujeres','Secrets Playa Blanca Costa Mujeres','Dreams Playa Mujeres','Grand Palladium Costa Mujeres','Grand Palladium Select Costa Mujeres','Family Selection at Grand Palladium Costa Mujeres','TRS Coral Hotel','Majestic Elegance Costa Mujeres','Haven Riviera Cancun','SLS Playa Mujeres','Estudio Playa Mujeres','Hotel Riu Latino','Hotel Riu Palace Costa Mujeres','Hotel Riu Dunamar','Planet Hollywood Cancun Adult Scene','Villa del Palmar Cancun Luxury Beach Resort','Garza Blanca Resort & Spa Cancun','Catalonia Grand Costa Mujeres','Ocean Azure Costa Mujeres','Ocean Allure Costa Mujeres','Club Med Cancun','Isla Mujeres Palace','Hotel Mousai Cancun','Hilton Cancun All-Inclusive','Now Natura Riviera Cancun']
+            },
+            'ISLA_BLANCA': {
+                nombre: 'Isla Blanca',
+                precioBase: 'ISLA_BLANCA',
+                multiplicador: 1.0,
+                hoteles: ['Casazul Isla Blanca','El Isleno Isla Blanca','Kite House Isla Blanca','Punta Norte Beach Club']
+            },
+            'PTO_MORELOS': {
+                nombre: 'Puerto Morelos',
+                precioBase: 'PTO_MORELOS',
+                multiplicador: 1.0,
+                hoteles: ['Grand Residences Riviera Cancun','Excellence Riviera Cancun','Dreams Riviera Cancun','Now Sapphire Riviera Cancun','Dreams Sapphire Resort & Spa','Dreams Jade Resort & Spa','Now Jade Riviera Cancun','Royalton Riviera Cancun','Hideaway at Royalton Riviera Cancun','Sensira Resort & Spa Riviera Maya','Margaritaville Island Reserve Riviera Maya','El Cid Marina Beach Hotel','Zoetry Paraiso de la Bonita','Desire Riviera Maya Resort','Desire Pearl Riviera Maya','Ocean Coral & Turquesa','Ocean Riviera Paradise','Generations Riviera Maya','The Fives Oceanfront Puerto Morelos','Vidanta Riviera Maya','Nickelodeon Hotels & Resorts Riviera Maya','Hacienda Morelos','Hotel Ojo de Agua','Now Nature Riviera Cancun','Breathless Riviera Cancun','Secrets Riviera Cancun']
+            },
+            'MAROMA': {
+                nombre: 'Maroma',
+                precioBase: 'PTO_MORELOS',
+                multiplicador: 1.15,
+                hoteles: ['Maroma, A Belmond Hotel','Secrets Maroma Beach Riviera Cancun','El Dorado Maroma','El Dorado Casitas Royale','El Dorado Royale','Etéreo, Auberge Resorts Collection','Palmaïa The House of AïA','Chablé Maroma','Catalonia Playa Maroma','Iberostar Waves Paraíso Beach','Iberostar Paraíso Beach','Iberostar Paraíso Del Mar','Iberostar Paraíso Lindo','Iberostar Paraíso Maya','Iberostar Selection Paraíso Lindo','Valentin Imperial Riviera Maya','Blue Diamond Luxury Boutique']
+            },
+            'MAYAKOBA': {
+                nombre: 'Mayakoba',
+                precioBase: 'PLAYA_CARMEN',
+                multiplicador: 0.90,
+                hoteles: ['Fairmont Mayakoba','Fairmont Heritage Place Mayakoba','Banyan Tree Mayakoba','Rosewood Mayakoba','Andaz Mayakoba','St. Regis Kanai Resort Riviera Maya','Grand Velas Riviera Maya','Hard Rock Hotel Riviera Maya','Tres Rios Resort']
+            },
+            'PLAYA_CARMEN': {
+                nombre: 'Playa del Carmen',
+                precioBase: 'PLAYA_CARMEN',
+                multiplicador: 1.0,
+                hoteles: ['Hilton Playa del Carmen','Grand Hyatt Playa del Carmen','Thompson Playa del Carmen','The Fives Downtown','Mahekal Beach Resort','The Palm at Playa','The Carmen Hotel','Wyndham Alltra Playa del Carmen','Panama Jack Resorts Playa del Carmen','Hyatt Vivid Playa del Carmen','The Reef 28','The Reef Coco Beach','Gran Porto Resort','Hotel B10','Hotel Colibri Beach','Indigo Beach Playa del Carmen','Paradisus Playa del Carmen','Paradisus La Perla','Paradisus La Esmeralda','Live Aqua Beach Resort Playa del Carmen','Secrets Moxché Playa del Carmen','Secrets Impression Moxché','Hotel Xcaret Mexico','Hotel Xcaret Arte','La Casa de la Playa','Occidental at Xcaret Destination','Dreams Aventuras Riviera Maya','Grand Riviera Princess','Platinum Yucatan Princess','Magic Blue Boutique','Be Playa','Porto Playa Condo Hotel','The Yucatan Resort Playa del Carmen','Thompson Beach House','Casa del Agua']
+            },
+            'PLAYACAR': {
+                nombre: 'Playacar',
+                precioBase: 'PLAYA_CARMEN',
+                multiplicador: 1.10,
+                hoteles: ['Sandos Playacar','Sandos Caracol','The Reef Playacar','Allegro Playacar','Riu Lupita','Riu Tequila','Riu Yucatan','Riu Palace Riviera Maya','Riu Palace Mexico','Royal Hideaway Playacar','Playacar Palace','Iberostar Quetzal','Iberostar Tucan','Viva Wyndham Maya','Viva Wyndham Azteca','Ocean Maya Royale']
+            },
+            'PTO_AVENTURAS': {
+                nombre: 'Puerto Aventuras',
+                precioBase: 'PLAYA_CARMEN',
+                multiplicador: 1.20,
+                hoteles: ['Dreams Puerto Aventuras','Catalonia Riviera Maya','Barcelo Maya Beach','Barcelo Maya Caribe','Barcelo Maya Colonial','Barcelo Maya Palace','Barcelo Maya Tropical','Barcelo Maya Grand Resort','Barcelo Maya Riviera','Azul Beach Resort Riviera Maya','Hard Rock Hotel Riviera Maya Heaven','Omni Puerto Aventuras Hotel']
+            },
+            'AKUMAL': {
+                nombre: 'Akumal',
+                precioBase: 'TULUM',
+                multiplicador: 0.70,
+                hoteles: ['Secrets Akumal Riviera Maya','Akumal Bay Beach & Wellness Resort','Hotel Akumal Caribe','Grand Palladium Kantenah','Grand Palladium White Sand','Grand Palladium Colonial','Grand Palladium Riviera','TRS Yucatan Hotel','Yal-Ku Dive Suites','Hacienda de la Tortuga']
+            },
+            'CHEMUYIL': {
+                nombre: 'Chemuyil / Bahía Príncipe',
+                precioBase: 'TULUM',
+                multiplicador: 0.85,
+                hoteles: ['Grand Bahia Principe Coba','Grand Bahia Principe Akumal','Grand Bahia Principe Tulum','Luxury Bahia Principe Sian Kaan','Luxury Bahia Principe Akumal','Luxury Bahia Principe Coba','Bahia Principe Riviera Maya','Conrad Tulum Riviera Maya','Hilton Tulum Riviera Maya','Unico 20°87° Hotel Riviera Maya','Xpu-Ha Palace','Catalonia Royal Tulum']
+            },
+            'TULUM': {
+                nombre: 'Tulum Centro',
+                precioBase: 'TULUM',
+                multiplicador: 1.0,
+                hoteles: ['Kore Tulum Retreat & Spa','Alaya Tulum','Hotel Bardo','Dreams Tulum Resort & Spa','Secrets Tulum Resort','Oasis Tulum Lite','Kimpton Aluna Resort Tulum','Delek Tulum','Amansala Eco-Chic Resort','Hotel Labnah Tulum','Hotel Posada 06 Tulum','Hotel Cielo Tulum','My Tulum Cabanas','Zamas Hotel','Nueva Vida de Ramiro','Hotel Maya Tulum']
+            },
+            'ZH_TULUM': {
+                nombre: 'Tulum Zona Hotelera',
+                precioBase: 'ZH_TULUM',
+                multiplicador: 1.0,
+                hoteles: ['Be Tulum','Casa Malca','Mi Amor Colibri Boutique Hotel','La Valise Tulum','Nomade Tulum','Ahau Tulum','Papaya Playa Project','Azulik Tulum','Our Habitas Tulum','The Beach Tulum','Nest Tulum','Encantada Tulum','Ana y Jose Hotel & Spa','Cabañas Tulum','Mia Tulum','Sana Tulum','Hotel Maxanab Tulum','Lula Tulum','Chiringuito Tulum','Coco Tulum','Selina Tulum','Kanan Tulum','Hotel Tiki Tiki Tulum','Tago Tulum','Xela Tulum','Orchid House Tulum','Rosa del Viento','Sanará Tulum','Ziggy Beach Club','Diamante K','Kin Tulum','Akiin Beach Tulum']
+            },
+            'HOLBOX': {
+                nombre: 'Holbox',
+                precioBase: 'CHIQUILA',
+                multiplicador: 1.0,
+                hoteles: ['Mystique Holbox by Royalton','Las Nubes de Holbox','Villas Flamingos','Casa Las Tortugas','Hotel Casa Sandra','Beachfront Hotel La Palapa','Xaloc Resort','Holbox Dream Hotel','Hotel Mawimbi','CasaSandra Holbox','Zomay Hotel Holbox','Hotel Casa Barbara','Tribu Hostel','Holbox by Xaloc','Villas HM Palapas del Mar','Hotel Posada Los Mapaches']
+            }
+        };
+        
+        // Función para buscar hoteles (autocompletado)
+        function buscarHoteles(query) {
+            var queryLower = query.toLowerCase();
+            var resultados = [];
+            
+            for (var zonaKey in HOTELES_DB) {
+                var zona = HOTELES_DB[zonaKey];
+                for (var i = 0; i < zona.hoteles.length; i++) {
+                    var hotel = zona.hoteles[i];
+                    if (hotel.toLowerCase().indexOf(queryLower) !== -1) {
+                        resultados.push({
+                            hotel: hotel,
+                            zona: zonaKey,
+                            nombreZona: zona.nombre,
+                            precioBase: zona.precioBase,
+                            multiplicador: zona.multiplicador
+                        });
+                        if (resultados.length >= 8) return resultados;
+                    }
+                }
+            }
+            return resultados;
+        }
+        
+        // Variables para búsqueda de hoteles
+        var hotelSearchTimeout;
+        var hotelSearchInput = document.getElementById('hotel-search');
+        var hotelSuggestions = document.getElementById('hotel-suggestions');
+        
+        // Mostrar/ocultar búsqueda de hotel
+        function toggleHotelSearch() {
+            var destSelect = document.getElementById('airport-destination');
+            var hotelContainer = document.getElementById('hotel-search-container');
+            
+            if (destSelect && destSelect.value) {
+                hotelContainer.style.display = 'block';
+            } else {
+                hotelContainer.style.display = 'none';
+            }
+        }
+        
+        if (hotelSearchInput) {
+            hotelSearchInput.addEventListener('input', function() {
+                var query = this.value;
+                
+                clearTimeout(hotelSearchTimeout);
+                
+                if (query.length < 2) {
+                    hotelSuggestions.classList.remove('active');
+                    return;
+                }
+                
+                hotelSearchTimeout = setTimeout(function() {
+                    var resultados = buscarHoteles(query);
+                    displayHotelSuggestions(resultados);
+                }, 150);
+            });
+            
+            hotelSearchInput.addEventListener('focus', function() {
+                if (this.value.length >= 2) {
+                    var resultados = buscarHoteles(this.value);
+                    if (resultados.length > 0) {
+                        displayHotelSuggestions(resultados);
+                    }
+                }
+            });
+        }
+        
+        // Cerrar sugerencias al hacer click fuera
+        document.addEventListener('click', function(e) {
+            if (hotelSuggestions && !hotelSuggestions.contains(e.target) && e.target !== hotelSearchInput) {
+                hotelSuggestions.classList.remove('active');
+            }
+        });
+        
+        function displayHotelSuggestions(resultados) {
+            hotelSuggestions.innerHTML = '';
+            
+            if (resultados.length === 0) {
+                hotelSuggestions.classList.remove('active');
+                return;
+            }
+            
+            resultados.forEach(function(item) {
+                var div = document.createElement('div');
+                div.className = 'hotel-suggestion';
+                div.innerHTML = '<div class="hotel-suggestion-name">' + item.hotel + '</div>' +
+                               '<div class="hotel-suggestion-address">📍 ' + item.nombreZona + '</div>';
+                
+                div.addEventListener('click', function() {
+                    selectHotel(item);
+                });
+                
+                hotelSuggestions.appendChild(div);
+            });
+            
+            hotelSuggestions.classList.add('active');
+        }
+        
+        function selectHotel(hotelInfo) {
+            // Guardar nombre del hotel
+            hotelSearchInput.value = hotelInfo.hotel;
+            
+            // Guardar info de zona para cálculo de precio
+            var zonaData = {
+                zona: hotelInfo.zona,
+                nombre: hotelInfo.nombreZona,
+                base: hotelInfo.precioBase,
+                multiplicador: hotelInfo.multiplicador
+            };
+            
+            document.getElementById('hotel-zone').value = JSON.stringify(zonaData);
+            
+            // Mostrar zona detectada
+            var zoneDisplay = document.getElementById('hotel-zone-display');
+            var zoneText = document.getElementById('zone-text');
+            zoneText.innerHTML = '📍 ' + hotelInfo.nombreZona;
+            zoneDisplay.style.display = 'block';
+            
+            // Cerrar sugerencias
+            hotelSuggestions.classList.remove('active');
+        }
+
+        // ==========================================
+        // TIPO DE CAMBIO USD/MXN (Automático)
+        // ==========================================
+        var tipoCambio = 18; // Default fallback
+        
+        // Obtener tipo de cambio actualizado
+        fetch('https://api.exchangerate-api.com/v4/latest/USD')
+            .then(function(response) { return response.json(); })
+            .then(function(data) {
+                if (data && data.rates && data.rates.MXN) {
+                    tipoCambio = data.rates.MXN;
+                    console.log('Tipo de cambio actualizado: $' + tipoCambio.toFixed(2) + ' MXN/USD');
+                }
+            })
+            .catch(function(error) {
+                console.log('Usando tipo de cambio default: $18 MXN/USD');
+            });
+
+        // ==========================================
+        // TABULADOR DE PRECIOS OPA2 (MXN)
+        // ==========================================
+        var PRECIOS = {
+            // Desde Aeropuerto Cancún (CUN)
+            'CUN': {
+                'ZH_CANCUN': { van10: 1000, van20: 1300, luxury: 1450, nombre: 'Zona Hotelera Cancún' },
+                'COSTA_MUJERES': { van10: 1200, van20: 1950, luxury: 1740, nombre: 'Costa Mujeres' },
+                'ISLA_BLANCA': { van10: 1400, van20: 1950, luxury: 1957, nombre: 'Isla Blanca' },
+                'PTO_MORELOS': { van10: 1300, van20: 1560, luxury: 1450, nombre: 'Puerto Morelos' },
+                'PLAYA_CARMEN': { van10: 1800, van20: 2470, luxury: 2175, nombre: 'Playa del Carmen' },
+                'PTO_AVENTURAS': { van10: 1900, van20: 2600, luxury: 2465, nombre: 'Puerto Aventuras / Akumal' },
+                'TULUM': { van10: 2400, van20: 3250, luxury: 3190, nombre: 'Tulum' },
+                'ZH_TULUM': { van10: 2400, van20: 3640, luxury: 3480, nombre: 'Zona Hotelera Tulum' },
+                'MERIDA': { van10: 8500, van20: 18000, luxury: 14500, nombre: 'Mérida' },
+                'CHETUMAL': { van10: 8500, van20: 18000, luxury: 14500, nombre: 'Chetumal' },
+                'CHIQUILA': { van10: 3900, van20: 6240, luxury: 6090, nombre: 'Chiquilá (Holbox)' }
+            },
+            // Desde Aeropuerto Tulum (TQO)
+            'TQO': {
+                'ZH_CANCUN': { van10: 4500, van20: 6500, luxury: 6525, nombre: 'Zona Hotelera Cancún' },
+                'COSTA_MUJERES': { van10: 5000, van20: 7800, luxury: 7250, nombre: 'Costa Mujeres' },
+                'ISLA_BLANCA': { van10: 5100, van20: 7800, luxury: 7250, nombre: 'Isla Blanca' },
+                'PTO_MORELOS': { van10: 3900, van20: 5980, luxury: 5800, nombre: 'Puerto Morelos' },
+                'PLAYA_CARMEN': { van10: 2860, van20: 4940, luxury: 4785, nombre: 'Playa del Carmen' },
+                'PTO_AVENTURAS': { van10: 2800, van20: 4550, luxury: 4350, nombre: 'Puerto Aventuras / Akumal' },
+                'TULUM_CENTRO': { van10: 1800, van20: 2340, luxury: 1740, nombre: 'Tulum Centro' },
+                'ZH_TULUM': { van10: 2200, van20: 2860, luxury: 2320, nombre: 'Zona Hotelera Tulum' },
+                'MERIDA': { van10: 10000, van20: 22000, luxury: 14500, nombre: 'Mérida' },
+                'CHETUMAL': { van10: 8000, van20: 15600, luxury: 11600, nombre: 'Chetumal' },
+                'CHIQUILA': { van10: 5850, van20: 11700, luxury: 11600, nombre: 'Chiquilá (Holbox)' }
+            },
+            // Desde Playa del Carmen
+            'PDC': {
+                'CANCUN': { van10: 1800, van20: 2600, luxury: 2610, nombre: 'Cancún' },
+                'CHIQUILA': { van10: 3900, van20: 5980, luxury: 5800, nombre: 'Chiquilá (Holbox)' },
+                'TULUM': { van10: 1800, van20: 2340, luxury: 2320, nombre: 'Tulum' },
+                'PTO_AVENTURAS': { van10: 1200, van20: 1690, luxury: 1667, nombre: 'Puerto Aventuras / Akumal' },
+                'MERIDA': { van10: 9000, van20: 12350, luxury: 10150, nombre: 'Mérida' },
+                'XOXIMILCO': { van10: 1800, van20: 3250, luxury: 2610, nombre: 'Xoximilco' },
+                'XCARET': { van10: 1000, van20: 1170, luxury: 1305, nombre: 'Xcaret / Xplor / Xenses' },
+                'XELHA': { van10: 1800, van20: 2340, luxury: 2465, nombre: 'Xel-Há' },
+                'CHICHEN': { van10: 8500, van20: 13000, luxury: 13050, nombre: 'Chichén Itzá' }
+            },
+            // Desde Cancún
+            'CANCUN': {
+                'XOXIMILCO': { van10: 1200, van20: 1690, luxury: 1450, nombre: 'Xoximilco' },
+                'XCARET': { van10: 1950, van20: 3640, luxury: 2900, nombre: 'Xcaret / Xplor / Xenses' },
+                'XELHA': { van10: 3500, van20: 4420, luxury: 4350, nombre: 'Xel-Há' },
+                'CHICHEN': { van10: 8500, van20: 13000, luxury: 13050, nombre: 'Chichén Itzá (Tour 6hrs)' }
+            },
+            // Desde Tulum
+            'TULUM': {
+                'XOXIMILCO': { van10: 3000, van20: 4550, luxury: 4785, nombre: 'Xoximilco' },
+                'XCARET': { van10: 1800, van20: 2340, luxury: 2900, nombre: 'Xcaret / Xplor / Xenses' },
+                'XELHA': { van10: 1500, van20: 2340, luxury: 2610, nombre: 'Xel-Há' },
+                'CHICHEN': { van10: 8500, van20: 13000, luxury: 13050, nombre: 'Chichén Itzá' }
+            }
+        };
+
+        // Número de WhatsApp de OPA2 (cambiar por el real)
+        var WHATSAPP_NUMBER = '529981234567';
+
+        // Actualizar destinos según origen seleccionado (Airport Shuttle)
+        function updateDestinations() {
+            var origen = document.getElementById('airport-origin').value;
+            var destinoSelect = document.getElementById('airport-destination');
+            
+            // Limpiar opciones
+            destinoSelect.innerHTML = '<option value="">Selecciona destino</option>';
+            
+            if (origen && PRECIOS[origen]) {
+                var destinos = PRECIOS[origen];
+                for (var key in destinos) {
+                    var option = document.createElement('option');
+                    option.value = key;
+                    option.textContent = destinos[key].nombre;
+                    destinoSelect.appendChild(option);
+                }
+            }
+        }
+
+        // Actualizar destinos para Private Transfer
+        function updateRegionalDestinations() {
+            var origen = document.getElementById('regional-origin').value;
+            var destinoSelect = document.getElementById('regional-destination');
+            
+            // Limpiar opciones
+            destinoSelect.innerHTML = '<option value="">Selecciona destino</option>';
+            
+            if (origen && PRECIOS[origen]) {
+                var destinos = PRECIOS[origen];
+                for (var key in destinos) {
+                    var option = document.createElement('option');
+                    option.value = key;
+                    option.textContent = destinos[key].nombre;
+                    destinoSelect.appendChild(option);
+                }
+            }
+        }
+
+        // Calcular precio real del tabulador
+        function calcularPrecioReal(origen, destino, pasajeros, isLuxury) {
+            if (!origen || !destino || !PRECIOS[origen] || !PRECIOS[origen][destino]) {
+                return null;
+            }
+            
+            var ruta = PRECIOS[origen][destino];
+            var precio;
+            var vehiculo;
+            
+            if (isLuxury && pasajeros <= 5) {
+                precio = ruta.luxury;
+                vehiculo = 'Luxury (1-5 pax)';
+            } else if (pasajeros <= 10) {
+                precio = ruta.van10;
+                vehiculo = 'Van (1-10 pax)';
+            } else {
+                precio = ruta.van20;
+                vehiculo = 'Sprinter (11-20 pax)';
+            }
+            
+            return { precio: precio, vehiculo: vehiculo, nombreDestino: ruta.nombre };
+        }
+        
+        // Calcular precio con zona detectada por distancia
+        function calcularPrecioConZona(origen, zonaInfo, pasajeros, isLuxury) {
+            if (!origen || !zonaInfo || !PRECIOS[origen]) {
+                return null;
+            }
+            
+            // Obtener precio base de la zona
+            var base = zonaInfo.base;
+            var ruta = PRECIOS[origen][base];
+            
+            if (!ruta) {
+                // Si no existe la zona base, buscar alternativa
+                if (base === 'TULUM' && PRECIOS[origen]['TULUM']) {
+                    ruta = PRECIOS[origen]['TULUM'];
+                } else if (PRECIOS[origen]['PLAYA_CARMEN']) {
+                    ruta = PRECIOS[origen]['PLAYA_CARMEN'];
+                } else {
+                    return null;
+                }
+            }
+            
+            var precioBase;
+            var vehiculo;
+            
+            if (isLuxury && pasajeros <= 5) {
+                precioBase = ruta.luxury;
+                vehiculo = 'Luxury (1-5 pax)';
+            } else if (pasajeros <= 10) {
+                precioBase = ruta.van10;
+                vehiculo = 'Van (1-10 pax)';
+            } else {
+                precioBase = ruta.van20;
+                vehiculo = 'Sprinter (11-20 pax)';
+            }
+            
+            // Aplicar multiplicador de zona
+            var precioFinal = Math.round(precioBase * zonaInfo.multiplicador);
+            
+            return { 
+                precio: precioFinal, 
+                vehiculo: vehiculo, 
+                nombreDestino: zonaInfo.nombre,
+                precioBase: precioBase,
+                multiplicador: zonaInfo.multiplicador
+            };
+        }
+
+        // Generar link de WhatsApp
+        function generarWhatsAppLink(origen, destino, fecha, hora, pasajeros, servicio) {
+            var mensaje = 'Hola, quiero cotizar un traslado:\n';
+            mensaje += '📍 Origen: ' + origen + '\n';
+            mensaje += '📍 Destino: ' + destino + '\n';
+            mensaje += '📅 Fecha: ' + fecha + '\n';
+            mensaje += '🕐 Hora: ' + hora + '\n';
+            mensaje += '👥 Pasajeros: ' + pasajeros + '\n';
+            mensaje += '⭐ Servicio: ' + servicio;
+            
+            return 'https://wa.me/' + WHATSAPP_NUMBER + '?text=' + encodeURIComponent(mensaje);
+        }
+
+        // Mostrar/ocultar campos de retorno según Ida/Redondo
+        function toggleReturnFields() {
+            var activeTab = document.querySelector('.form-tab.active');
+            var returnFields = document.getElementById('return-fields');
+            var isRoundTrip = activeTab && (activeTab.innerText.indexOf('Redondo') !== -1 || activeTab.innerText.indexOf('Round') !== -1);
+            
+            if (isRoundTrip) {
+                returnFields.style.display = 'grid';
+            } else {
+                returnFields.style.display = 'none';
+            }
+        }
+
+        // Event listeners para tabs Ida/Redondo
+        var formTabs = document.querySelectorAll('.form-tab');
+        for (var i = 0; i < formTabs.length; i++) {
+            formTabs[i].addEventListener('click', function() {
+                // Cambiar tab activo
+                for (var j = 0; j < formTabs.length; j++) {
+                    formTabs[j].classList.remove('active');
+                }
+                this.classList.add('active');
+                // Mostrar/ocultar campos retorno
+                toggleReturnFields();
+            });
+        }
+
         // Track Booking demo
         var trackBtn = document.querySelector('.track-btn');
         trackBtn.onclick = function() {
@@ -1151,16 +1624,6 @@
             return 'OPA2-' + year + '-' + num;
         }
 
-        // Calculate price based on passengers and service
-        function calculatePrice(passengers, serviceType) {
-            var basePrice = 45;
-            if (passengers > 3) basePrice = 65;
-            if (passengers > 6) basePrice = 95;
-            if (passengers > 10) basePrice = 140;
-            if (serviceType === 'elite') basePrice += 20;
-            return basePrice;
-        }
-
         // Form submit - show quote modal with real data
         var formSubmit = document.querySelector('.form-submit');
         formSubmit.onclick = function(e) {
@@ -1172,69 +1635,134 @@
             var serviceName = serviceType === 'airport' ? 'Airport Shuttle' : 'Private Transfer';
             
             // Get origin and destination
-            var origin, destination;
+            var origen, destino, origenText, destinoText;
             if (serviceType === 'airport') {
-                var originSelect = document.querySelector('#form-airport .form-select');
-                var destSelect = document.querySelectorAll('#form-airport .form-select')[1];
-                origin = originSelect ? originSelect.options[originSelect.selectedIndex].text : 'Aeropuerto Cancún (CUN)';
-                destination = destSelect ? destSelect.options[destSelect.selectedIndex].text : 'Playa del Carmen';
+                var originSelect = document.getElementById('airport-origin');
+                var destSelect = document.getElementById('airport-destination');
+                origen = originSelect ? originSelect.value : '';
+                destino = destSelect ? destSelect.value : '';
+                origenText = originSelect && originSelect.selectedIndex > 0 ? originSelect.options[originSelect.selectedIndex].text : '';
+                destinoText = destSelect && destSelect.selectedIndex > 0 ? destSelect.options[destSelect.selectedIndex].text : '';
+                
+                // Agregar nombre del hotel si fue seleccionado
+                var hotelSearch = document.getElementById('hotel-search');
+                var hotelZoneInput = document.getElementById('hotel-zone');
+                var hotelName = hotelSearch ? hotelSearch.value : '';
+                var hotelZoneInfo = null;
+                
+                if (hotelZoneInput && hotelZoneInput.value) {
+                    try {
+                        hotelZoneInfo = JSON.parse(hotelZoneInput.value);
+                    } catch(e) {}
+                }
+                
+                if (hotelName) {
+                    if (hotelZoneInfo) {
+                        destinoText = hotelName + ' (' + hotelZoneInfo.nombre + ')';
+                    } else {
+                        destinoText = hotelName + ' (' + destinoText + ')';
+                    }
+                }
             } else {
-                var originInput = document.querySelector('#form-regional .form-input');
-                var destInput = document.querySelectorAll('#form-regional .form-input')[1];
-                origin = originInput && originInput.value ? originInput.value : 'Origen no especificado';
-                destination = destInput && destInput.value ? destInput.value : 'Destino no especificado';
+                var originSelect = document.getElementById('regional-origin');
+                var destSelect = document.getElementById('regional-destination');
+                origen = originSelect ? originSelect.value : '';
+                destino = destSelect ? destSelect.value : '';
+                origenText = originSelect && originSelect.selectedIndex > 0 ? originSelect.options[originSelect.selectedIndex].text : '';
+                destinoText = destSelect && destSelect.selectedIndex > 0 ? destSelect.options[destSelect.selectedIndex].text : '';
+            }
+            
+            // Validar selección
+            if (!origen || !destino) {
+                alert(currentLang === 'es' ? 'Por favor selecciona origen y destino' : 'Please select origin and destination');
+                return;
             }
             
             // Get date and time
-            var dateInput = document.querySelector('.form-input[type="date"]');
-            var timeInput = document.querySelector('.form-input[type="time"]');
-            var dateStr = 'Fecha no especificada';
+            var dateInput = document.getElementById('fecha-ida');
+            var timeInput = document.getElementById('hora-ida');
+            var returnDateInput = document.getElementById('fecha-retorno');
+            var returnTimeInput = document.getElementById('hora-retorno');
+            var dateStr = currentLang === 'es' ? 'Fecha no especificada' : 'Date not specified';
+            var fechaRaw = '';
+            var horaRaw = '';
             if (dateInput && dateInput.value) {
-                var d = new Date(dateInput.value);
-                var months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+                fechaRaw = dateInput.value;
+                var d = new Date(dateInput.value + 'T00:00:00');
+                var months = currentLang === 'es' ? 
+                    ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'] :
+                    ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
                 dateStr = d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear();
                 if (timeInput && timeInput.value) {
+                    horaRaw = timeInput.value;
                     dateStr += ', ' + timeInput.value;
+                }
+                // Agregar fecha de retorno si es redondo
+                var activeFormTab = document.querySelector('.form-tab.active');
+                var isRoundTrip = activeFormTab && (activeFormTab.innerText.indexOf('Redondo') !== -1 || activeFormTab.innerText.indexOf('Round') !== -1);
+                if (isRoundTrip && returnDateInput && returnDateInput.value) {
+                    var dReturn = new Date(returnDateInput.value + 'T00:00:00');
+                    dateStr += (currentLang === 'es' ? ' → ' : ' → ') + dReturn.getDate() + ' ' + months[dReturn.getMonth()] + ' ' + dReturn.getFullYear();
+                    if (returnTimeInput && returnTimeInput.value) {
+                        dateStr += ', ' + returnTimeInput.value;
+                    }
                 }
             }
             
-            // Get service level (Estándar/Elite)
-            var serviceLevelSelect = document.querySelector('.form-select[id="service-level"]') || document.querySelectorAll('.form-select')[2];
-            var serviceLevel = 'Estándar';
-            var isElite = false;
-            if (serviceLevelSelect && serviceLevelSelect.value) {
-                serviceLevel = serviceLevelSelect.options[serviceLevelSelect.selectedIndex].text;
-                isElite = serviceLevel.indexOf('Elite') !== -1;
+            // Get service level (Estándar/Luxury)
+            var serviceLevelSelect = document.querySelectorAll('.form-select');
+            var lastSelect = serviceLevelSelect[serviceLevelSelect.length - 1];
+            var isLuxury = lastSelect && lastSelect.value === 'elite';
+            var serviceLevel = isLuxury ? 'Luxury' : 'Estándar';
+            
+            // Calcular precio real
+            var resultado = calcularPrecioReal(origen, destino, passengers, isLuxury);
+            
+            if (!resultado) {
+                // No hay precio en tabulador - enviar a WhatsApp
+                var whatsappLink = generarWhatsAppLink(origenText, destinoText, fechaRaw, horaRaw, passengers, serviceLevel);
+                window.open(whatsappLink, '_blank');
+                return;
             }
             
-            // Get vehicle based on passengers
-            var vehicle = 'Sedán';
-            if (passengers > 3) vehicle = 'SUV / Van';
-            if (passengers > 10) vehicle = 'Sprinter';
-            vehicle += ' (' + serviceLevel + ')';
-            
-            // Calculate price
-            var price = calculatePrice(passengers, isElite ? 'elite' : 'standard');
+            var precio = resultado.precio;
+            var vehiculo = resultado.vehiculo;
             
             // Check if round trip
             var activeFormTab = document.querySelector('.form-tab.active');
-            var isRoundTrip = activeFormTab && activeFormTab.innerText.indexOf('Redondo') !== -1;
+            var isRoundTrip = activeFormTab && (activeFormTab.innerText.indexOf('Redondo') !== -1 || activeFormTab.innerText.indexOf('Round') !== -1);
             if (isRoundTrip) {
-                price = Math.round(price * 1.8); // 10% discount for round trip
+                precio = precio * 2;
+            }
+            
+            // Calcular precio en USD
+            var precioUSD = Math.round(precio / tipoCambio);
+            
+            // Mostrar precio según idioma
+            var precioDisplay, precioBtn;
+            if (currentLang === 'es') {
+                precioDisplay = '$' + precio.toLocaleString() + ' MXN';
+                precioBtn = 'Pagar $' + precio.toLocaleString() + ' MXN';
+            } else {
+                precioDisplay = '$' + precioUSD.toLocaleString() + ' USD';
+                precioBtn = 'Pay $' + precioUSD.toLocaleString() + ' USD';
             }
             
             // Update modal with real data
-            document.getElementById('quote-service').innerText = serviceName + (isRoundTrip ? ' (Redondo)' : ' (Ida)');
-            document.getElementById('quote-origin').innerText = origin;
-            document.getElementById('quote-destination').innerText = destination;
+            document.getElementById('quote-service').innerText = serviceName + (isRoundTrip ? (currentLang === 'es' ? ' (Redondo)' : ' (Round trip)') : (currentLang === 'es' ? ' (Ida)' : ' (One way)'));
+            document.getElementById('quote-origin').innerText = origenText;
+            document.getElementById('quote-destination').innerText = destinoText;
             document.getElementById('quote-date').innerText = dateStr;
             document.getElementById('quote-passengers').innerText = passengers;
-            document.getElementById('quote-vehicle').innerText = vehicle;
-            document.getElementById('quote-total').innerText = '$' + price + ' USD';
+            document.getElementById('quote-vehicle').innerText = vehiculo + ' - ' + serviceLevel;
+            document.getElementById('quote-total').innerText = precioDisplay;
+            
+            // Update payment modal
+            document.getElementById('payment-total').innerText = precioDisplay;
             
             // Update pay button
             var payBtn = document.getElementById('pay-btn');
-            payBtn.innerText = (currentLang === 'es' ? 'Pagar $' : 'Pay $') + price + ' USD';
+            payBtn.innerText = precioBtn;
             
             // Generate booking code for confirmation
             var bookingCode = generateBookingCode();
