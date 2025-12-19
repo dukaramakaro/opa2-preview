@@ -1725,8 +1725,24 @@
             var isLuxury = lastSelect && lastSelect.value === 'elite';
             var serviceLevel = isLuxury ? 'Luxury' : 'Estándar';
             
-            // Calcular precio real
-            var resultado = calcularPrecioReal(origen, destino, passengers, isLuxury);
+            // Calcular precio real - usar zona del hotel si está disponible
+            var resultado;
+            var hotelZoneInput = document.getElementById('hotel-zone');
+            var hotelZoneInfo = null;
+            
+            if (hotelZoneInput && hotelZoneInput.value) {
+                try {
+                    hotelZoneInfo = JSON.parse(hotelZoneInput.value);
+                } catch(e) {}
+            }
+            
+            if (hotelZoneInfo && hotelZoneInfo.base) {
+                // Usar precio con zona del hotel
+                resultado = calcularPrecioConZona(origen, hotelZoneInfo, passengers, isLuxury);
+            } else {
+                // Usar precio directo del tabulador
+                resultado = calcularPrecioReal(origen, destino, passengers, isLuxury);
+            }
             
             if (!resultado) {
                 // No hay precio en tabulador - enviar a WhatsApp
@@ -1766,13 +1782,6 @@
             document.getElementById('quote-passengers').innerText = passengers;
             document.getElementById('quote-vehicle').innerText = vehiculo + ' - ' + serviceLevel;
             document.getElementById('quote-total').innerText = precioDisplay;
-            
-            // Update payment modal
-            document.getElementById('payment-total').innerText = precioDisplay;
-            
-            // Update pay button
-            var payBtn = document.getElementById('pay-btn');
-            payBtn.innerText = precioBtn;
             
             // Generate booking code for confirmation
             var bookingCode = generateBookingCode();
