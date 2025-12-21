@@ -945,7 +945,8 @@
                     <label class="form-label" data-es="Notas adicionales (opcional)" data-en="Additional notes (optional)">Notas adicionales (opcional)</label>
                     <textarea class="form-input" id="client-notes" placeholder="Sillas para niños, equipaje extra, etc." rows="2" style="resize: none;"></textarea>
                 </div>
-                <button class="modal-btn primary" onclick="submitReservation()" data-es="Enviar solicitud" data-en="Submit request">Enviar solicitud</button>
+                <button class="modal-btn primary" onclick="submitReservation()" data-es="Reservar sin pagar" data-en="Reserve without payment">Reservar sin pagar</button>
+                <button class="modal-btn primary" onclick="pagarConStripe()" style="background: #635BFF; margin-bottom: 10px;" data-es="💳 Pagar ahora" data-en="💳 Pay now">💳 Pagar ahora</button>
                 <button class="modal-btn secondary" onclick="showModal('modal-quote')" data-es="Atrás" data-en="Back">Atrás</button>
             </div>
         </div>
@@ -1933,6 +1934,95 @@
             msg += '💰 *Total:* ' + data.total + '\n\n';
             msg += '📅 Solicitud: ' + data.fechaSolicitud;
             return msg;
+        }
+        
+        // Pagar con Stripe
+        function pagarConStripe() {
+            // Validar campos
+            var name = document.getElementById('client-name').value.trim();
+            var email = document.getElementById('client-email').value.trim();
+            var phone = document.getElementById('client-phone').value.trim();
+            
+            if (!name || !email || !phone) {
+                alert(currentLang === 'es' ? 'Por favor completa nombre, email y teléfono' : 'Please fill in name, email and phone');
+                return;
+            }
+            
+            if (!email.includes('@') || !email.includes('.')) {
+                alert(currentLang === 'es' ? 'Por favor ingresa un email válido' : 'Please enter a valid email');
+                return;
+            }
+            
+            // Obtener precio en MXN (sin formato)
+            var precioText = document.getElementById('quote-total').innerText;
+            var precioMXN = parseInt(precioText.replace(/[^0-9]/g, ''));
+            
+            // Si está en USD, convertir a MXN
+            if (precioText.includes('USD')) {
+                precioMXN = precioMXN * Math.round(tipoCambio);
+            }
+            
+            // Descripción del servicio
+            var descripcion = reservationData.servicio + ' - ' + reservationData.origen + ' → ' + reservationData.destino + ' - ' + reservationData.fecha;
+            
+            // Mostrar loading
+            var payBtn = document.querySelector('#modal-details .modal-btn.primary[onclick="pagarConStripe()"]');
+            var originalText = payBtn.innerText;
+            payBtn.innerText = currentLang === 'es' ? 'Procesando...' : 'Processing...';
+            payBtn.disabled = true;
+            
+            // Primero enviar email y WhatsApp
+            var flight = document.getElementById('client-flight').value.trim();
+            var notes = document.getElementById('client-notes').value.trim();
+            
+            var fullData = {
+                nombre: name,
+                email: email,
+                telefono: phone,
+                vuelo: flight || 'No especificado',
+                notas: notes || 'Sin notas',
+                codigo: reservationData.codigo,
+                servicio: reservationData.servicio,
+                origen: reservationData.origen,
+                destino: reservationData.destino,
+                fecha: reservationData.fecha,
+                pasajeros: reservationData.pasajeros,
+                vehiculo: reservationData.vehiculo,
+                total: reservationData.total + ' (PAGO PENDIENTE)',
+                idioma: currentLang,
+                fechaSolicitud: new Date().toLocaleString('es-MX')
+            };
+            
+            // Enviar notificación
+            sendReservationEmail(fullData, function() {});
+            var whatsappMsg = generarMensajeWhatsApp(fullData);
+            // No abrir WhatsApp, solo preparar
+            
+            // Llamar al backend para crear sesión de Stripe
+            fetch('/crear-pago', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    precio: precioMXN,
+                    descripcion: descripcion,
+                    codigo: reservationData.codigo,
+                    email: email
+                })
+            })
+            .then(function(response) { return response.json(); })
+            .then(function(data) {
+                if (data.url) {
+                    window.location.href = data.url;
+                } else {
+                    throw new Error(data.error || 'Error al crear pago');
+                }
+            })
+            .catch(function(error) {
+                console.error('Error:', error);
+                alert(currentLang === 'es' ? 'Error al procesar el pago. Intenta de nuevo.' : 'Payment error. Please try again.');
+                payBtn.innerText = originalText;
+                payBtn.disabled = false;
+            });
         }
     </script>
 </body>

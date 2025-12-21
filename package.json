@@ -1,10 +1,13 @@
 {
-  "name": "opa2-preview",
+  "name": "opa2-website",
   "version": "1.0.0",
+  "description": "OPA2 Transfers - Transportación Premium Riviera Maya",
+  "main": "server.js",
   "scripts": {
-    "start": "npx serve -s . -l $PORT"
+    "start": "node server.js"
   },
   "dependencies": {
-    "serve": "^14.2.0"
+    "express": "^4.18.2",
+    "stripe": "^14.5.0"
   }
 }
