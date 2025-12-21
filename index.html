@@ -1877,15 +1877,17 @@
         }
         
         function sendReservationEmail(data, callback) {
-            // Verificar si EmailJS está configurado
-            if (typeof emailjs === 'undefined' || !window.EMAILJS_CONFIGURED) {
-                console.log('EmailJS no configurado, usando WhatsApp');
+            // Inicializar EmailJS
+            if (typeof emailjs !== 'undefined') {
+                emailjs.init('Od_x7excGF1h9o6gM');
+            } else {
+                console.log('EmailJS no cargado, usando WhatsApp');
                 callback(false);
                 return;
             }
             
             // Enviar email con EmailJS
-            emailjs.send('service_opa2', 'template_reserva', {
+            emailjs.send('service_7azvg4g', 'template_6k2clag', {
                 to_email: 'soporteopa2@gmail.com',
                 from_name: data.nombre,
                 from_email: data.email,
