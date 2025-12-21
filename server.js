@@ -3,7 +3,7 @@ const Stripe = require('stripe');
 const path = require('path');
 
 const app = express();
-const stripe = Stripe('sk_test_51SgXdJRwgHVCrnG8WdJlhS3yiSuVgjmMfJpgkZ7p0ziOF53tsRutlMoXIeUJJkKxTKTnNl2DnIXVjt5s7zfRJBVR00JRxRhkAC');
+const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 
 app.use(express.json());
 app.use(express.static('.'));
