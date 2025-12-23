@@ -1863,6 +1863,20 @@
             
             // Enviar por EmailJS (si está configurado) + WhatsApp como respaldo
             sendReservationEmail(fullData, function(success) {
+                // Guardar en base de datos CSV
+                fetch('/guardar-reserva', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        ...fullData,
+                        estado: 'Pendiente'
+                    })
+                }).then(function() {
+                    console.log('Reserva guardada en CSV');
+                }).catch(function(err) {
+                    console.error('Error guardando en CSV:', err);
+                });
+                
                 submitBtn.innerText = originalText;
                 submitBtn.disabled = false;
                 
@@ -1995,8 +2009,21 @@
             
             // Enviar notificación
             sendReservationEmail(fullData, function() {});
-            var whatsappMsg = generarMensajeWhatsApp(fullData);
-            // No abrir WhatsApp, solo preparar
+            
+            // Guardar en CSV
+            fetch('/guardar-reserva', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    ...fullData,
+                    total: reservationData.total, // Sin el texto de pendiente
+                    estado: 'Pago en proceso'
+                })
+            }).then(function() {
+                console.log('Reserva guardada en CSV');
+            }).catch(function(err) {
+                console.error('Error guardando en CSV:', err);
+            });
             
             // Llamar al backend para crear sesión de Stripe
             fetch('/crear-pago', {

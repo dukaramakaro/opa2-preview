@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - OPA2 Reservas</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Sora', sans-serif; 
+            background: #fafafa; 
+            min-height: 100vh;
+        }
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .login-box {
+            background: white;
+            border-radius: 24px;
+            padding: 40px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+        }
+        .login-box h1 {
+            font-size: 24px;
+            margin-bottom: 8px;
+            color: #1a1a1a;
+        }
+        .login-box p {
+            color: #6b6b6b;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: #1a1a1a;
+        }
+        .form-input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 15px;
+            font-family: 'Sora', sans-serif;
+            transition: all 0.3s;
+        }
+        .form-input:focus {
+            outline: none;
+            border-color: #E63946;
+        }
+        .btn {
+            width: 100%;
+            padding: 16px;
+            background: #E63946;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Sora', sans-serif;
+            transition: all 0.3s;
+        }
+        .btn:hover {
+            background: #c62f3b;
+            transform: translateY(-2px);
+        }
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .dashboard {
+            display: none;
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .header {
+            background: white;
+            padding: 24px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .header h1 {
+            font-size: 24px;
+            color: #1a1a1a;
+        }
+        .btn-download {
+            padding: 12px 24px;
+            background: #00a699;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Sora', sans-serif;
+            transition: all 0.3s;
+        }
+        .btn-download:hover {
+            background: #008c81;
+            transform: translateY(-2px);
+        }
+        .btn-logout {
+            padding: 12px 24px;
+            background: #6b6b6b;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Sora', sans-serif;
+            margin-left: 10px;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .stat-label {
+            font-size: 13px;
+            color: #6b6b6b;
+            margin-bottom: 8px;
+        }
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #E63946;
+        }
+        .table-container {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th {
+            text-align: left;
+            padding: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #6b6b6b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        td {
+            padding: 16px 12px;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 14px;
+        }
+        tr:hover {
+            background: #fafafa;
+        }
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .badge-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .badge-paid {
+            background: #d4edda;
+            color: #155724;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6b6b6b;
+        }
+        .empty-state svg {
+            width: 60px;
+            height: 60px;
+            margin-bottom: 16px;
+            stroke: #d0d0d0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Login -->
+    <div class="login-container" id="login-view">
+        <div class="login-box">
+            <h1>Panel Admin OPA2</h1>
+            <p>Ingresa tu contraseña para acceder</p>
+            <div class="form-group">
+                <label class="form-label">Contraseña</label>
+                <input type="password" class="form-input" id="password" placeholder="••••••••">
+            </div>
+            <button class="btn" onclick="login()">Ingresar</button>
+        </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div class="dashboard" id="dashboard-view">
+        <div class="header">
+            <h1>📋 Reservas OPA2</h1>
+            <div>
+                <button class="btn-download" onclick="descargarCSV()">📥 Descargar CSV</button>
+                <button class="btn-logout" onclick="logout()">Salir</button>
+            </div>
+        </div>
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-label">Total Reservas</div>
+                <div class="stat-value" id="stat-total">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Hoy</div>
+                <div class="stat-value" id="stat-today">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Esta Semana</div>
+                <div class="stat-value" id="stat-week">0</div>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table id="reservas-table">
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Código</th>
+                        <th>Cliente</th>
+                        <th>Contacto</th>
+                        <th>Servicio</th>
+                        <th>Ruta</th>
+                        <th>Viaje</th>
+                        <th>Total</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody id="reservas-body"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        let authToken = localStorage.getItem('opa2_auth');
+        
+        if (authToken) {
+            loadDashboard();
+        }
+
+        function login() {
+            const password = document.getElementById('password').value;
+            
+            fetch('/admin/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ password })
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    authToken = data.token;
+                    localStorage.setItem('opa2_auth', authToken);
+                    loadDashboard();
+                } else {
+                    alert('Contraseña incorrecta');
+                }
+            });
+        }
+
+        function logout() {
+            localStorage.removeItem('opa2_auth');
+            location.reload();
+        }
+
+        function loadDashboard() {
+            document.getElementById('login-view').style.display = 'none';
+            document.getElementById('dashboard-view').style.display = 'block';
+            cargarReservas();
+        }
+
+        function cargarReservas() {
+            fetch('/admin/reservas', {
+                headers: { 'Authorization': 'Bearer ' + authToken }
+            })
+            .then(r => r.json())
+            .then(data => {
+                const reservas = data.reservas || [];
+                
+                // Stats
+                document.getElementById('stat-total').textContent = reservas.length;
+                
+                const today = new Date().toISOString().split('T')[0];
+                const todayCount = reservas.filter(r => r.Fecha.startsWith(today)).length;
+                document.getElementById('stat-today').textContent = todayCount;
+                
+                const weekAgo = new Date(Date.now() - 7*24*60*60*1000).toISOString();
+                const weekCount = reservas.filter(r => r.Fecha >= weekAgo).length;
+                document.getElementById('stat-week').textContent = weekCount;
+                
+                // Table
+                const tbody = document.getElementById('reservas-body');
+                if (reservas.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="9" class="empty-state"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" /></svg><p>No hay reservas aún</p></td></tr>';
+                    return;
+                }
+                
+                tbody.innerHTML = reservas.map(r => `
+                    <tr>
+                        <td>${new Date(r.Fecha).toLocaleDateString('es-MX', {day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit'})}</td>
+                        <td><strong>${r.Codigo}</strong></td>
+                        <td>${r.Nombre}</td>
+                        <td>${r.Email}<br><small style="color:#6b6b6b">${r.Telefono}</small></td>
+                        <td>${r.Servicio}</td>
+                        <td>${r.Origen} → ${r.Destino}</td>
+                        <td>${r.FechaViaje}<br><small style="color:#6b6b6b">${r.Pasajeros} pax</small></td>
+                        <td><strong>${r.Total}</strong></td>
+                        <td><span class="badge ${r.Estado === 'Pagado' ? 'badge-paid' : 'badge-pending'}">${r.Estado}</span></td>
+                    </tr>
+                `).join('');
+            });
+        }
+
+        function descargarCSV() {
+            window.location.href = '/admin/descargar?' + new URLSearchParams({
+                authorization: 'Bearer ' + authToken
+            });
+        }
+
+        // Recargar cada 30 segundos
+        setInterval(cargarReservas, 30000);
+    </script>
+</body>
+</html>
