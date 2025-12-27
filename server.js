@@ -59,7 +59,7 @@ app.post('/crear-pago', async (req, res) => {
         const { precio, descripcion, codigo, email } = req.body;
         
         const session = await stripe.checkout.sessions.create({
-            payment_method_types: ['card'],
+            payment_method_types: ['card', 'oxxo'],
             line_items: [{
                 price_data: {
                     currency: 'mxn',

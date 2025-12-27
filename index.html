@@ -19,7 +19,14 @@
             --opa2-white: #ffffff;
             --opa2-cream: #f5f5f3;
         }
-        body { font-family: 'Sora', sans-serif; background: #fafafa; color: var(--opa2-black); }
+        body { 
+            font-family: 'Sora', sans-serif; 
+            background: #fafafa;
+            background-image: 
+                repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(230,57,70,0.02) 35px, rgba(230,57,70,0.02) 70px),
+                repeating-linear-gradient(-45deg, transparent, transparent 35px, rgba(0,166,153,0.015) 35px, rgba(0,166,153,0.015) 70px);
+            color: var(--opa2-black);
+        }
         
         /* NAVBAR */
         .nav {
@@ -945,8 +952,8 @@
                     <label class="form-label" data-es="Notas adicionales (opcional)" data-en="Additional notes (optional)">Notas adicionales (opcional)</label>
                     <textarea class="form-input" id="client-notes" placeholder="Sillas para niños, equipaje extra, etc." rows="2" style="resize: none;"></textarea>
                 </div>
-                <button class="modal-btn primary" onclick="submitReservation()" data-es="Reservar sin pagar" data-en="Reserve without payment">Reservar sin pagar</button>
-                <button class="modal-btn primary" onclick="pagarConStripe()" style="background: #635BFF; margin-bottom: 10px;" data-es="💳 Pagar ahora" data-en="💳 Pay now">💳 Pagar ahora</button>
+                <button class="modal-btn primary" onclick="pagarConStripe()" style="background: #635BFF;" data-es="💳 Pagar con tarjeta" data-en="💳 Pay with card">💳 Pagar con tarjeta</button>
+                <button class="modal-btn secondary" onclick="contactarOtraFormaPago()" style="font-size: 14px; padding: 12px;" data-es="Otras formas de pago" data-en="Other payment methods">Otras formas de pago</button>
                 <button class="modal-btn secondary" onclick="showModal('modal-quote')" data-es="Atrás" data-en="Back">Atrás</button>
             </div>
         </div>
@@ -2050,6 +2057,32 @@
                 payBtn.innerText = originalText;
                 payBtn.disabled = false;
             });
+        }
+        
+        // Contactar para otras formas de pago
+        function contactarOtraFormaPago() {
+            var name = document.getElementById('client-name').value.trim();
+            var phone = document.getElementById('client-phone').value.trim();
+            
+            if (!name || !phone) {
+                alert(currentLang === 'es' ? 'Por favor completa tu nombre y teléfono' : 'Please fill in your name and phone');
+                return;
+            }
+            
+            var msg = '💳 *CONSULTA OTRAS FORMAS DE PAGO*\n\n';
+            msg += '👤 *Cliente:* ' + name + '\n';
+            msg += '📱 *Teléfono:* ' + phone + '\n';
+            msg += '━━━━━━━━━━━━━━━━\n\n';
+            msg += '🚗 *Servicio solicitado:*\n';
+            msg += reservationData.servicio + '\n';
+            msg += reservationData.origen + ' → ' + reservationData.destino + '\n';
+            msg += '📅 ' + reservationData.fecha + '\n';
+            msg += '👥 ' + reservationData.pasajeros + ' pasajeros\n';
+            msg += '💰 ' + reservationData.total + '\n\n';
+            msg += '💵 *Consulta sobre:* Depósito / Transferencia / Efectivo / OXXO';
+            
+            window.open('https://wa.me/529842160298?text=' + encodeURIComponent(msg), '_blank');
+            closeModal('modal-details');
         }
     </script>
 </body>
