@@ -21,11 +21,24 @@
         }
         body { 
             font-family: 'Sora', sans-serif; 
-            background: #fafafa;
-            background-image: 
-                repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(230,57,70,0.02) 35px, rgba(230,57,70,0.02) 70px),
-                repeating-linear-gradient(-45deg, transparent, transparent 35px, rgba(0,166,153,0.015) 35px, rgba(0,166,153,0.015) 70px);
+            background: linear-gradient(135deg, #ffffff 0%, #f8f8f8 100%);
+            background-attachment: fixed;
             color: var(--opa2-black);
+            position: relative;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url('data:image/svg+xml,<svg width="400" height="400" xmlns="http://www.w3.org/2000/svg"><path d="M0,0 L120,0 L80,90 L30,110 Z M120,0 L240,0 L200,80 L120,90 Z M240,0 L400,0 L350,120 L240,100 Z M0,110 L80,90 L120,180 L40,200 Z M80,90 L200,80 L180,170 L120,180 Z M200,80 L350,120 L320,190 L180,170 Z M0,200 L40,200 L60,290 L0,320 Z M40,200 L180,170 L150,280 L60,290 Z M180,170 L320,190 L280,300 L150,280 Z M320,190 L400,120 L400,310 L280,300 Z M0,320 L60,290 L100,400 L0,400 Z M60,290 L150,280 L180,380 L100,400 Z M150,280 L280,300 L260,400 L180,380 Z M280,300 L400,310 L400,400 L260,400 Z" fill="none" stroke="rgba(26,26,26,0.025)" stroke-width="1.5"/></svg>');
+            background-size: 400px 400px;
+            opacity: 1;
+            pointer-events: none;
+            z-index: 0;
         }
         
         /* NAVBAR */
@@ -46,13 +59,15 @@
         /* HERO */
         .hero {
             min-height: 100vh; 
-            display: grid; 
-            grid-template-columns: 1.1fr 0.9fr;
-            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%);
+            display: flex;
+            align-items: center;
+            background: linear-gradient(135deg, #ffffff 0%, #e8e8e8 100%);
             position: relative;
             overflow: hidden;
             padding-top: 110px;
         }
+        
+        /* Voronoi pattern background */
         .hero::before {
             content: '';
             position: absolute;
@@ -60,48 +75,96 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: 
-                radial-gradient(circle at 20% 50%, rgba(230,57,70,0.15) 0%, transparent 50%),
-                radial-gradient(circle at 80% 80%, rgba(0,166,153,0.12) 0%, transparent 50%);
-            animation: pulse 15s ease-in-out infinite;
+            background-image: url('data:image/svg+xml,<svg width="400" height="400" xmlns="http://www.w3.org/2000/svg"><path d="M0,0 L120,0 L80,90 L30,110 Z M120,0 L240,0 L200,80 L120,90 Z M240,0 L400,0 L350,120 L240,100 Z M0,110 L80,90 L120,180 L40,200 Z M80,90 L200,80 L180,170 L120,180 Z M200,80 L350,120 L320,190 L180,170 Z M0,200 L40,200 L60,290 L0,320 Z M40,200 L180,170 L150,280 L60,290 Z M180,170 L320,190 L280,300 L150,280 Z M320,190 L400,120 L400,310 L280,300 Z M0,320 L60,290 L100,400 L0,400 Z M60,290 L150,280 L180,380 L100,400 Z M150,280 L280,300 L260,400 L180,380 Z M280,300 L400,310 L400,400 L260,400 Z" fill="none" stroke="rgba(26,26,26,0.06)" stroke-width="2"/></svg>');
+            background-size: 350px 350px;
+            opacity: 0.7;
+            z-index: 1;
         }
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
-        }
+        
+        /* Glow effect */
         .hero::after {
             content: '';
             position: absolute;
-            top: -50%;
-            right: -20%;
-            width: 800px;
-            height: 800px;
-            background: radial-gradient(circle, rgba(230,57,70,0.08) 0%, transparent 70%);
+            top: 20%;
+            right: 10%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(230,57,70,0.1) 0%, transparent 60%);
             border-radius: 50%;
-            filter: blur(100px);
+            animation: pulseGlow 8s ease-in-out infinite;
+            z-index: 2;
         }
-        .hero-content { display: flex; flex-direction: column; justify-content: center; padding: 40px 40px 60px 60px; position: relative; z-index: 1; }
+        
+        @keyframes pulseGlow {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.08); }
+        }
+        
+        /* Voronoi pattern with image overlay */
+        .voronoi-with-image {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 55%;
+            height: 100%;
+            z-index: 3;
+        }
+        
+        .voronoi-with-image::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url('data:image/svg+xml,<svg width="400" height="400" xmlns="http://www.w3.org/2000/svg"><path d="M200,80 L280,120 L240,200 L200,80 Z M280,120 L350,180 L300,250 L240,200 Z" fill="rgba(26,26,26,0.02)" stroke="rgba(26,26,26,0.08)" stroke-width="2"/><path d="M150,200 L240,200 L220,300 L170,280 Z" fill="rgba(230,57,70,0.03)" stroke="rgba(230,57,70,0.1)" stroke-width="2"/></svg>');
+            background-size: 300px 300px;
+            opacity: 0.8;
+            z-index: 1;
+        }
+        
+        .integrated-suburban {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%;
+            opacity: 0.22;
+            filter: drop-shadow(0 20px 40px rgba(0,0,0,0.3));
+            mix-blend-mode: multiply;
+            z-index: 2;
+        }
+        
+        .hero-content { 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            padding: 60px; 
+            max-width: 700px;
+            position: relative; 
+            z-index: 10; 
+        }
         .hero-badge {
             display: inline-flex; align-items: center; gap: 10px;
-            background: rgba(230, 57, 70, 0.15); border: 1px solid rgba(230, 57, 70, 0.3);
+            background: rgba(230, 57, 70, 0.1); border: 1px solid rgba(230, 57, 70, 0.3);
             padding: 10px 18px; border-radius: 100px; font-size: 13px; font-weight: 600;
-            color: #ff6b77; margin-bottom: 28px; width: fit-content;
+            color: var(--opa2-red); margin-bottom: 28px; width: fit-content;
         }
         .hero-badge::before { content: ''; width: 8px; height: 8px; background: var(--opa2-red); border-radius: 50%; animation: pulseBadge 2s infinite; }
         @keyframes pulseBadge { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
-        .hero-title { font-size: 56px; font-weight: 700; line-height: 1.15; margin-bottom: 20px; color: white; }
+        .hero-title { font-size: 56px; font-weight: 700; line-height: 1.15; margin-bottom: 20px; color: var(--opa2-black); }
         .hero-title span { color: var(--opa2-red); }
-        .hero-subtitle { font-size: 18px; color: rgba(255,255,255,0.75); line-height: 1.75; max-width: 500px; margin-bottom: 44px; }
+        .hero-subtitle { font-size: 18px; color: #4a4a4a; line-height: 1.75; max-width: 500px; margin-bottom: 44px; }
         .hero-features { display: flex; gap: 40px; }
         .hero-feature { display: flex; align-items: center; gap: 14px; }
-        .hero-feature-icon { width: 48px; height: 48px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; }
+        .hero-feature-icon { width: 48px; height: 48px; background: rgba(230,57,70,0.08); border: 1px solid rgba(230,57,70,0.15); border-radius: 12px; display: flex; align-items: center; justify-content: center; }
         .hero-feature-icon svg { width: 22px; height: 22px; stroke: var(--opa2-red); }
-        .hero-feature-text { font-size: 14px; color: rgba(255,255,255,0.6); }
-        .hero-feature-text strong { display: block; color: white; font-weight: 600; }
-        .hero-stats { display: flex; gap: 48px; margin-top: 50px; padding-top: 40px; border-top: 1px solid rgba(255,255,255,0.1); }
-        .hero-stat-value { font-size: 36px; font-weight: 700; color: white; }
+        .hero-feature-text { font-size: 14px; color: #666; }
+        .hero-feature-text strong { display: block; color: var(--opa2-black); font-weight: 600; }
+        .hero-stats { display: flex; gap: 48px; margin-top: 50px; padding-top: 40px; border-top: 1px solid rgba(0,0,0,0.1); }
+        .hero-stat-value { font-size: 36px; font-weight: 700; color: var(--opa2-black); }
         .hero-stat-value span { color: var(--opa2-red); }
-        .hero-stat-label { font-size: 13px; color: rgba(255,255,255,0.6); margin-top: 6px; }
+        .hero-stat-label { font-size: 13px; color: #666; margin-top: 6px; }
         
         /* FORM */
         .hero-form-container { display: flex; align-items: center; justify-content: center; padding: 40px; }
@@ -214,15 +277,6 @@
         .servicio-desc { font-size: 15px; color: var(--opa2-gray); line-height: 1.7; }
 
         /* DESTINOS */
-        .destinos { background: var(--opa2-cream); }
-        .destinos-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
-        .destino-card { position: relative; border-radius: 20px; overflow: hidden; height: 300px; cursor: pointer; }
-        .destino-card img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s; }
-        .destino-card:hover img { transform: scale(1.1); }
-        .destino-overlay { position: absolute; bottom: 0; left: 0; right: 0; padding: 30px; background: linear-gradient(transparent, rgba(0,0,0,0.8)); color: white; }
-        .destino-name { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
-        .destino-price { font-size: 14px; opacity: 0.9; }
-        .destino-price span { font-weight: 700; font-size: 18px; }
 
         /* FLOTA */
         .flota { background: white; }
@@ -359,7 +413,6 @@
             .hero-form-container { padding: 20px 30px 60px; }
             .booking-form { margin: 0 auto; }
             .servicios-grid { grid-template-columns: 1fr; }
-            .destinos-grid { grid-template-columns: repeat(2, 1fr); }
             .flota-grid { grid-template-columns: repeat(2, 1fr); }
             .why-grid { grid-template-columns: repeat(2, 1fr); }
             .footer-grid { grid-template-columns: repeat(2, 1fr); }
@@ -374,7 +427,7 @@
             .nav { padding: 0 20px; height: 90px; }
             .nav-logo img { height: 60px; }
             .nav-links > a:not(.nav-lang a) { display: none; }
-            .destinos-grid, .flota-grid, .why-grid { grid-template-columns: 1fr; }
+            .flota-grid, .why-grid { grid-template-columns: 1fr; }
             .hero { background-position: center 20%; background-size: 100% auto; }
             .hero-title { font-size: 32px; }
             .hero-content { padding: 30px 20px; }
@@ -400,7 +453,6 @@
         </div>
         <div class="nav-links">
             <a href="#servicios" data-es="Servicios" data-en="Services">Servicios</a>
-            <a href="#destinos" data-es="Destinos" data-en="Destinations">Destinos</a>
             <a href="#flota" data-es="Flota" data-en="Fleet">Flota</a>
             <a href="#nosotros" data-es="Nosotros" data-en="About Us">Nosotros</a>
             <a href="#track" data-es="Mi Reservación" data-en="My Booking">Mi Reservación</a>
@@ -413,6 +465,11 @@
     </nav>
 
     <section class="hero">
+        <!-- Voronoi with integrated Suburban image -->
+        <div class="voronoi-with-image">
+            <img src="img/suburban-hero.png" alt="Chevrolet Suburban Elite" class="integrated-suburban">
+        </div>
+        
         <div class="hero-content">
             <div class="hero-badge" data-es="Servicio disponible 24/7" data-en="Service available 24/7">Servicio disponible 24/7</div>
             <h1 class="hero-title" data-es="Transportación <span>Premium</span> en la Riviera Maya" data-en="<span>Premium</span> Transportation in the Riviera Maya">Transportación <span>Premium</span> en la Riviera Maya</h1>
@@ -568,43 +625,6 @@
         </div>
     </section>
 
-    <section class="destinos" id="destinos">
-        <div class="section-header">
-            <p class="section-label" data-es="Nuestros Destinos" data-en="Our Destinations">Nuestros Destinos</p>
-            <h2 class="section-title" data-es="Llegamos a toda la Riviera Maya" data-en="We reach all of the Riviera Maya">Llegamos a toda la Riviera Maya</h2>
-            <p class="section-subtitle" data-es="Desde el aeropuerto hasta tu destino favorito con tarifas transparentes." data-en="From the airport to your favorite destination with transparent rates.">Desde el aeropuerto hasta tu destino favorito con tarifas transparentes.</p>
-        </div>
-        <div class="destinos-grid">
-            <div class="destino-card">
-                <img src="https://images.pexels.com/photos/1174732/pexels-photo-1174732.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Playa del Carmen">
-                <div class="destino-overlay">
-                    <h3 class="destino-name">Playa del Carmen</h3>
-                    <p class="destino-price" data-es="Desde" data-en="From"><span data-es="Desde" data-en="From">Desde</span> <span>$XX USD</span></p>
-                </div>
-            </div>
-            <div class="destino-card">
-                <img src="https://images.pexels.com/photos/3822155/pexels-photo-3822155.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Tulum">
-                <div class="destino-overlay">
-                    <h3 class="destino-name">Tulum</h3>
-                    <p class="destino-price"><span data-es="Desde" data-en="From">Desde</span> <span>$XX USD</span></p>
-                </div>
-            </div>
-            <div class="destino-card">
-                <img src="https://images.pexels.com/photos/1450340/pexels-photo-1450340.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Cancún Zona Hotelera">
-                <div class="destino-overlay">
-                    <h3 class="destino-name">Cancún Zona Hotelera</h3>
-                    <p class="destino-price"><span data-es="Desde" data-en="From">Desde</span> <span>$XX USD</span></p>
-                </div>
-            </div>
-            <div class="destino-card">
-                <img src="https://images.pexels.com/photos/1032650/pexels-photo-1032650.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Puerto Morelos">
-                <div class="destino-overlay">
-                    <h3 class="destino-name">Puerto Morelos</h3>
-                    <p class="destino-price"><span data-es="Desde" data-en="From">Desde</span> <span>$XX USD</span></p>
-                </div>
-            </div>
-        </div>
-    </section>
 
     <section class="flota" id="flota">
         <div class="section-header">
@@ -614,32 +634,32 @@
         </div>
         <div class="flota-grid">
             <div class="flota-card">
-                <div class="flota-img"><img src="img/sedan.png" alt="Sedán Ejecutivo"></div>
+                <div class="flota-img"><img src="img/hiace.jpg" alt="Van Estándar"></div>
                 <div class="flota-content">
                     <p class="flota-type" data-es="Estándar" data-en="Standard">Estándar</p>
-                    <h3 class="flota-name" data-es="Sedán Ejecutivo" data-en="Executive Sedan">Sedán Ejecutivo</h3>
+                    <h3 class="flota-name" data-es="Van Estándar" data-en="Standard Van">Van Estándar</h3>
                     <div class="flota-specs">
-                        <span class="flota-spec"><svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0" /></svg> <span data-es="1-3 pasajeros" data-en="1-3 passengers">1-3 pasajeros</span></span>
-                        <span class="flota-spec"><svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 14.15v4.25c0 1.094-.787 2.036-1.872 2.18-2.087.277-4.216.42-6.378.42s-4.291-.143-6.378-.42c-1.085-.144-1.872-1.086-1.872-2.18v-4.25" /></svg> <span data-es="3 maletas" data-en="3 bags">3 maletas</span></span>
+                        <span class="flota-spec"><svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0" /></svg> <span data-es="1-10 pasajeros" data-en="1-10 passengers">1-10 pasajeros</span></span>
+                        <span class="flota-spec"><svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 14.15v4.25c0 1.094-.787 2.036-1.872 2.18-2.087.277-4.216.42-6.378.42s-4.291-.143-6.378-.42c-1.085-.144-1.872-1.086-1.872-2.18v-4.25" /></svg> <span data-es="10 maletas" data-en="10 bags">10 maletas</span></span>
                     </div>
                 </div>
             </div>
             <div class="flota-card">
-                <div class="flota-img"><img src="img/suv.png" alt="SUV Premium"></div>
+                <div class="flota-img"><img src="img/suburban-elite.png" alt="OPA2 Elite"></div>
                 <div class="flota-content">
                     <p class="flota-type">OPA2 Elite</p>
-                    <h3 class="flota-name">SUV / Van</h3>
+                    <h3 class="flota-name" data-es="Servicio Elite" data-en="Elite Service">Servicio Elite</h3>
                     <div class="flota-specs">
-                        <span class="flota-spec"><svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0" /></svg> <span data-es="4-10 pasajeros" data-en="4-10 passengers">4-10 pasajeros</span></span>
-                        <span class="flota-spec"><svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 14.15v4.25c0 1.094-.787 2.036-1.872 2.18-2.087.277-4.216.42-6.378.42s-4.291-.143-6.378-.42c-1.085-.144-1.872-1.086-1.872-2.18v-4.25" /></svg> <span data-es="8 maletas" data-en="8 bags">8 maletas</span></span>
+                        <span class="flota-spec"><svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0" /></svg> <span data-es="1-5 pasajeros" data-en="1-5 passengers">1-5 pasajeros</span></span>
+                        <span class="flota-spec"><svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 14.15v4.25c0 1.094-.787 2.036-1.872 2.18-2.087.277-4.216.42-6.378.42s-4.291-.143-6.378-.42c-1.085-.144-1.872-1.086-1.872-2.18v-4.25" /></svg> <span data-es="5 maletas" data-en="5 bags">5 maletas</span></span>
                     </div>
                 </div>
             </div>
             <div class="flota-card">
-                <div class="flota-img"><img src="img/sprinter.png" alt="Sprinter"></div>
+                <div class="flota-img"><img src="img/sprinter-flipped.png" alt="Servicio para Grupos"></div>
                 <div class="flota-content">
                     <p class="flota-type" data-es="Grupos" data-en="Groups">Grupos</p>
-                    <h3 class="flota-name">Sprinter</h3>
+                    <h3 class="flota-name" data-es="Servicio para Grupos" data-en="Group Service">Servicio para Grupos</h3>
                     <div class="flota-specs">
                         <span class="flota-spec"><svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0" /></svg> <span data-es="11-20 pasajeros" data-en="11-20 passengers">11-20 pasajeros</span></span>
                         <span class="flota-spec"><svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 14.15v4.25c0 1.094-.787 2.036-1.872 2.18-2.087.277-4.216.42-6.378.42s-4.291-.143-6.378-.42c-1.085-.144-1.872-1.086-1.872-2.18v-4.25" /></svg> <span data-es="15+ maletas" data-en="15+ bags">15+ maletas</span></span>
@@ -871,20 +891,11 @@
                 </ul>
             </div>
             <div>
-                <h4 class="footer-title" data-es="Destinos" data-en="Destinations">Destinos</h4>
-                <ul class="footer-links">
-                    <li><a href="#">Playa del Carmen</a></li>
-                    <li><a href="#">Tulum</a></li>
-                    <li><a href="#">Cancún</a></li>
-                    <li><a href="#">Puerto Morelos</a></li>
-                </ul>
-            </div>
-            <div>
                 <h4 class="footer-title" data-es="Contacto" data-en="Contact">Contacto</h4>
                 <ul class="footer-links">
-                    <li><a href="#">+52 XXX XXX XXXX</a></li>
-                    <li><a href="#"><span class="__cf_email__" data-cfemail="5a33343c351a352a3b68743722">[email&#160;protected]</span></a></li>
-                    <li><a href="#">WhatsApp</a></li>
+                    <li><a href="tel:+529842160298">+52 984 216 0298</a></li>
+                    <li><a href="mailto:soporteopa2@gmail.com">soporteopa2@gmail.com</a></li>
+                    <li><a href="https://wa.me/529842160298" target="_blank">WhatsApp</a></li>
                 </ul>
             </div>
         </div>
