@@ -25,6 +25,13 @@
             background-attachment: fixed;
             color: var(--opa2-black);
             position: relative;
+            touch-action: pan-y;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
         }
         
         body {
@@ -406,7 +413,7 @@
             .nav-logo img { height: 60px; }
             .nav-links > a:not(.nav-lang a) { display: none; }
             .flota-grid, .why-grid { grid-template-columns: 1fr; }
-            .hero { background-position: 55% center; background-size: cover; }
+            .hero { background-position: 48% center; background-size: cover; }
             .hero-title { font-size: 32px; }
             .hero-content { padding: 30px 20px; }
             .hero-form-container { padding: 10px 20px 50px; }
@@ -2357,6 +2364,29 @@
             
             lastScroll = currentScroll;
         });
+    </script>
+
+    <script>
+        // Prevenir zoom en móviles (especialmente iOS)
+        document.addEventListener('gesturestart', function(e) {
+            e.preventDefault();
+        });
+        document.addEventListener('gesturechange', function(e) {
+            e.preventDefault();
+        });
+        document.addEventListener('gestureend', function(e) {
+            e.preventDefault();
+        });
+        
+        // Prevenir doble tap zoom
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', function(e) {
+            const now = Date.now();
+            if (now - lastTouchEnd <= 300) {
+                e.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
     </script>
 
 
