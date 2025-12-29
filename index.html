@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>OPA2 - Transportación Premium Riviera Maya</title>
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- EmailJS SDK -->
@@ -23,6 +23,7 @@
             -moz-user-select: none;
             -ms-user-select: none;
             user-select: none;
+            -webkit-text-size-adjust: none;
         }
         
         :root {
@@ -172,7 +173,7 @@
         .form-content.active { display: block; }
         .form-group { margin-bottom: 18px; }
         .form-label { display: block; font-size: 12px; font-weight: 600; color: var(--opa2-gray-dark); margin-bottom: 8px; text-transform: uppercase; }
-        .form-input, .form-select { width: 100%; padding: 14px 16px; background: rgba(245, 245, 243, 0.7); border: 1px solid transparent; border-radius: 10px; font-family: 'Sora', sans-serif; font-size: 14px; transition: all 0.3s; }
+        .form-input, .form-select { width: 100%; padding: 14px 16px; background: rgba(245, 245, 243, 0.7); border: 1px solid transparent; border-radius: 10px; font-family: 'Sora', sans-serif; font-size: 16px !important; transition: all 0.3s; }
         .form-input:focus, .form-select:focus { outline: none; border-color: var(--opa2-red); background: rgba(255, 255, 255, 0.9); }
         .form-select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill='none' stroke='%236b6b6b' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; cursor: pointer; }
         
@@ -2413,35 +2414,13 @@
     </script>
 
     <script>
-        // BLOQUEO TOTAL de zoom en iOS
+        // BLOQUEO de zoom accidental (funciona bien en Android, ayuda en iOS)
         document.addEventListener('touchstart', function(e) {
             if (e.touches.length > 1) {
                 e.preventDefault();
             }
         }, { passive: false });
         
-        document.addEventListener('touchmove', function(e) {
-            if (e.scale !== 1) {
-                e.preventDefault();
-            }
-        }, { passive: false });
-        
-        document.addEventListener('gesturestart', function(e) {
-            e.preventDefault();
-            document.body.style.zoom = 1;
-        }, { passive: false });
-        
-        document.addEventListener('gesturechange', function(e) {
-            e.preventDefault();
-            document.body.style.zoom = 1;
-        }, { passive: false });
-        
-        document.addEventListener('gestureend', function(e) {
-            e.preventDefault();
-            document.body.style.zoom = 1;
-        }, { passive: false });
-        
-        // Prevenir doble tap zoom
         let lastTouchEnd = 0;
         document.addEventListener('touchend', function(e) {
             const now = Date.now();
@@ -2450,14 +2429,12 @@
             }
             lastTouchEnd = now;
         }, { passive: false });
-        
-        // Reset zoom si cambia
-        window.addEventListener('resize', function() {
-            if (window.visualViewport) {
-                if (window.visualViewport.scale !== 1) {
-                    window.visualViewport.scale = 1;
-                }
-            }
+
+        // Prevenir gesture events en iOS
+        ['gesturestart', 'gesturechange', 'gestureend'].forEach(event => {
+            document.addEventListener(event, function(e) {
+                e.preventDefault();
+            }, { passive: false });
         });
     </script>
 
