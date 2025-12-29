@@ -269,7 +269,27 @@
         let authToken = localStorage.getItem('opa2_auth');
         
         if (authToken) {
-            loadDashboard();
+            // Validar token con servidor
+            fetch('/admin/validate', {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + authToken
+                }
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.valid) {
+                    loadDashboard();
+                } else {
+                    localStorage.removeItem('opa2_auth');
+                    authToken = null;
+                }
+            })
+            .catch(() => {
+                localStorage.removeItem('opa2_auth');
+                authToken = null;
+            });
         }
 
         function login() {

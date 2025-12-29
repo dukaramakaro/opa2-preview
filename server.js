@@ -97,6 +97,21 @@ app.post('/admin/login', (req, res) => {
     }
 });
 
+// Panel admin - validar token
+app.post('/admin/validate', (req, res) => {
+    const auth = req.headers.authorization;
+    if (!auth) {
+        return res.json({ valid: false });
+    }
+    try {
+        const token = auth.split(' ')[1];
+        const password = Buffer.from(token, 'base64').toString();
+        res.json({ valid: password === ADMIN_PASSWORD });
+    } catch (error) {
+        res.json({ valid: false });
+    }
+});
+
 // Panel admin - ver reservas
 app.get('/admin/reservas', (req, res) => {
     const auth = req.headers.authorization;
