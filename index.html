@@ -2413,16 +2413,33 @@
     </script>
 
     <script>
-        // Prevenir zoom en móviles (especialmente iOS)
+        // BLOQUEO TOTAL de zoom en iOS
+        document.addEventListener('touchstart', function(e) {
+            if (e.touches.length > 1) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+        
+        document.addEventListener('touchmove', function(e) {
+            if (e.scale !== 1) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+        
         document.addEventListener('gesturestart', function(e) {
             e.preventDefault();
-        });
+            document.body.style.zoom = 1;
+        }, { passive: false });
+        
         document.addEventListener('gesturechange', function(e) {
             e.preventDefault();
-        });
+            document.body.style.zoom = 1;
+        }, { passive: false });
+        
         document.addEventListener('gestureend', function(e) {
             e.preventDefault();
-        });
+            document.body.style.zoom = 1;
+        }, { passive: false });
         
         // Prevenir doble tap zoom
         let lastTouchEnd = 0;
@@ -2432,7 +2449,16 @@
                 e.preventDefault();
             }
             lastTouchEnd = now;
-        }, false);
+        }, { passive: false });
+        
+        // Reset zoom si cambia
+        window.addEventListener('resize', function() {
+            if (window.visualViewport) {
+                if (window.visualViewport.scale !== 1) {
+                    window.visualViewport.scale = 1;
+                }
+            }
+        });
     </script>
 
 
