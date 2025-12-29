@@ -8,11 +8,21 @@
     <!-- EmailJS SDK -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+        }
         
         html {
-            touch-action: manipulation;
-            -ms-touch-action: manipulation;
+            touch-action: pan-x pan-y;
+            -ms-touch-action: pan-x pan-y;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
         }
         
         :root {
@@ -541,19 +551,37 @@
         @media (max-width: 1024px) {
             .google-reviews-container {
                 grid-template-columns: 1fr;
-                padding: 30px;
+                padding: 20px;
+                text-align: center;
+            }
+            .google-map-wrapper {
+                margin: 0 auto 30px;
+                max-width: 100%;
             }
             .google-map-wrapper iframe {
                 height: 250px;
             }
+            .google-rating-info {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+            }
             .google-rating-badge {
                 padding: 15px 20px;
+                margin: 0 auto 20px;
             }
             .google-rating-score {
                 font-size: 36px;
             }
             .google-rating-stars {
                 font-size: 24px;
+            }
+            .google-reviews-count {
+                margin-bottom: 20px;
+            }
+            .google-link-btn {
+                margin: 0 auto;
             }
         }
 
