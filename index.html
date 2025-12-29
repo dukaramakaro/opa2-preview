@@ -9,6 +9,12 @@
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        html {
+            touch-action: manipulation;
+            -ms-touch-action: manipulation;
+        }
+        
         :root {
             --opa2-red: #E63946;
             --opa2-red-dark: #c62f3b;
@@ -536,6 +542,18 @@
             .google-reviews-container {
                 grid-template-columns: 1fr;
                 padding: 30px;
+            }
+            .google-map-wrapper iframe {
+                height: 250px;
+            }
+            .google-rating-badge {
+                padding: 15px 20px;
+            }
+            .google-rating-score {
+                font-size: 36px;
+            }
+            .google-rating-stars {
+                font-size: 24px;
             }
         }
 
