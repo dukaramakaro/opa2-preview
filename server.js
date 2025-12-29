@@ -11,7 +11,7 @@ app.use(express.static('.'));
 
 // Archivo CSV para reservas
 const CSV_FILE = 'reservas.csv';
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'opa2admin';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'playa2026*';
 
 // Inicializar CSV si no existe
 if (!fs.existsSync(CSV_FILE)) {
