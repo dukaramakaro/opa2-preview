@@ -2273,17 +2273,14 @@
                 return;
             }
             
-            var msg = '💳 *CONSULTA OTRAS FORMAS DE PAGO*\n\n';
-            msg += '👤 *Cliente:* ' + name + '\n';
-            msg += '📱 *Teléfono:* ' + phone + '\n';
-            msg += '━━━━━━━━━━━━━━━━\n\n';
-            msg += '🚗 *Servicio solicitado:*\n';
-            msg += reservationData.servicio + '\n';
-            msg += reservationData.origen + ' → ' + reservationData.destino + '\n';
-            msg += '📅 ' + reservationData.fecha + '\n';
-            msg += '👥 ' + reservationData.pasajeros + ' pasajeros\n';
-            msg += '💰 ' + reservationData.total + '\n\n';
-            msg += '💵 *Consulta sobre:* Depósito / Transferencia / Efectivo / OXXO';
+            var msg = 'Hola, solicito información sobre otras formas de pago:\n\n';
+            msg += 'Nombre: ' + name + '\n';
+            msg += 'Teléfono: ' + phone + '\n\n';
+            msg += 'Servicio: ' + reservationData.servicio + '\n';
+            msg += 'Ruta: ' + reservationData.origen + ' - ' + reservationData.destino + '\n';
+            msg += 'Fecha: ' + reservationData.fecha + '\n';
+            msg += 'Pasajeros: ' + reservationData.pasajeros + '\n';
+            msg += 'Total: ' + reservationData.total;
             
             window.open('https://wa.me/529842160298?text=' + encodeURIComponent(msg), '_blank');
             closeModal('modal-details');
