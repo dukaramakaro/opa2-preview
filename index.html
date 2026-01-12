@@ -1391,7 +1391,7 @@
         };
         
         counterBtns[1].onclick = function() {
-            if (passengers < 20) {
+            if (passengers < 50) {
                 passengers++;
                 counterValue.innerText = passengers;
             }
@@ -1905,20 +1905,21 @@
             var vehiculo;
             
             if (isLuxury) {
-                if (pasajeros <= 5) {
-                    precio = ruta.luxury;
+                var unidades = Math.ceil(pasajeros / 5);
+                precio = ruta.luxury * unidades;
+                if (unidades === 1) {
                     vehiculo = 'Luxury (1-5 pax)';
                 } else {
-                    // MÁS DE 5 PASAJEROS = 2 SUBURBANS
-                    precio = ruta.luxury * 2;
-                    vehiculo = 'Luxury x2 (6+ pax)';
+                    vehiculo = 'Luxury x' + unidades + ' (' + pasajeros + ' pax)';
                 }
             } else if (pasajeros <= 10) {
                 precio = ruta.van10;
                 vehiculo = 'Van (1-10 pax)';
-            } else {
+            } else if (pasajeros <= 20) {
                 precio = ruta.van20;
                 vehiculo = 'Sprinter (11-20 pax)';
+            } else {
+                return { precio: null, vehiculo: null, error: 'Máximo 20 pasajeros para Van/Sprinter. Para más, cotización por WhatsApp.' };
             }
             
             return { precio: precio, vehiculo: vehiculo, nombreDestino: ruta.nombre };
@@ -1976,6 +1977,16 @@
                 multiplicador: zonaInfo.multiplicador
             };
         }
+
+        function mostrarErrorCotizacion(msg) {
+            var resultadoDiv = document.getElementById('cotizacion-resultado');
+            if (resultadoDiv) {
+                resultadoDiv.innerHTML = '<div style="padding:12px 14px; border-radius:12px; background:#fff5f5; color:#b00020; border:1px solid #ffd0d0;">' + msg + '</div>';
+            } else {
+                alert(msg);
+            }
+        }
+
 
         // Generar link de WhatsApp
         function generarWhatsAppLink(origen, destino, fecha, hora, pasajeros, servicio) {
@@ -2245,6 +2256,10 @@
                 return;
             }
             
+            if (resultado && resultado.error) {
+                mostrarErrorCotizacion(resultado.error);
+                return;
+            }
             var precio = resultado.precio;
             var vehiculo = resultado.vehiculo;
             
