@@ -82,20 +82,22 @@
         /* HERO */
 
         .flip-x { transform: scaleX(-1); }
-	        .hero {
-	            min-height: 100vh;
-	            display: flex;
-	            align-items: center;
-	            position: relative;
-	            overflow: hidden;
-	            padding: 120px 60px 80px;
-	            background-image:
-	                linear-gradient(135deg, rgba(26,26,26,0.65) 0%, rgba(26,26,26,0.45) 100%),
-	                url('img/Luxury_Bakcground.png');
-	            background-repeat: no-repeat;
-	            background-size: cover;
-	            background-position: right center;
-	        }
+        .hero {
+    background-image: url('img/hero-tulum.png');
+    background-size: contain;
+    background-position: right center;
+    background-repeat: no-repeat;
+min-height: 100vh; 
+            display: flex;
+            align-items: center;
+            background: linear-gradient(135deg, rgba(26,26,26,0.65) 0%, rgba(26,26,26,0.45) 100%),
+                        url('img/Luxury_Bakcground.png');
+            background-size: contain;
+            background-position: right center;
+            position: relative;
+            overflow: hidden;
+            padding: 120px 60px 80px;
+            }
         
         /* Voronoi sutil sobre la foto */
         .hero::before {
@@ -435,7 +437,7 @@
             .nav-logo img { height: 60px; }
             .nav-links > a:not(.nav-lang a) { display: none; }
             .flota-grid, .why-grid { grid-template-columns: 1fr; }
-	            .hero { background-position: center; background-size: cover; }
+            .hero { background-position: right center; background-size: contain; }
             .hero-title { font-size: 32px; }
             .hero-content { padding: 30px 20px; }
             .hero-form-container { padding: 10px 20px 50px; }
