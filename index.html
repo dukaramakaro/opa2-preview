@@ -89,7 +89,7 @@
             background: linear-gradient(135deg, rgba(26,26,26,0.65) 0%, rgba(26,26,26,0.45) 100%),
                         url('img/Luxury_Bakcground.png');
             background-size: cover;
-            background-position: 85% center;
+            background-position: right -120px center;
             background-repeat: no-repeat;
             position: relative;
             overflow: hidden;
@@ -434,7 +434,7 @@
             .nav-logo img { height: 60px; }
             .nav-links > a:not(.nav-lang a) { display: none; }
             .flota-grid, .why-grid { grid-template-columns: 1fr; }
-            .hero { background-position: 85% center; background-size: cover; }
+            .hero { background-position: right -120px center; background-size: cover; }
             .hero-title { font-size: 32px; }
             .hero-content { padding: 30px 20px; }
             .hero-form-container { padding: 10px 20px 50px; }
@@ -757,6 +757,10 @@
                     </select>
                 </div>
                 <button type="submit" class="form-submit" data-es="Obtener cotización" data-en="Get quote">Obtener cotización</button>
+                <a id="whatsapp-quote-link" href="#" target="_blank" rel="noopener" style="display:none; margin-top:10px; text-align:center; font-weight:700; color: var(--opa2-red); text-decoration:none;">
+                    <span data-es="Cotizar por WhatsApp" data-en="Quote via WhatsApp">Cotizar por WhatsApp</span>
+                </a>
+
             </form>
         </div>
     </section>
@@ -2269,6 +2273,19 @@
             var serviceLevel = isLuxury ? 'Luxury' : 'Estándar';
             
             // Calcular precio - siempre usar dropdown de destino
+
+            // Actualizar link visible a WhatsApp (Airport Shuttle)
+            var waLinkEl = document.getElementById('whatsapp-quote-link');
+            if (waLinkEl) {
+                if (serviceType === 'airport') {
+                    var waHref = generarWhatsAppLink(origenText, destinoText, fechaRaw, horaRaw, passengers, serviceLevel);
+                    waLinkEl.href = waHref;
+                    waLinkEl.style.display = 'block';
+                } else {
+                    waLinkEl.style.display = 'none';
+                }
+            }
+
             var resultado = calcularPrecioReal(origen, destino, passengers, isLuxury);
             
             if (!resultado) {
