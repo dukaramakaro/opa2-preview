@@ -89,7 +89,7 @@
             background: linear-gradient(135deg, rgba(26,26,26,0.65) 0%, rgba(26,26,26,0.45) 100%),
                         url('img/Luxury_Bakcground.png');
             background-size: cover;
-            background-position: 70% center;
+            background-position: 85% center;
             background-repeat: no-repeat;
             position: relative;
             overflow: hidden;
@@ -289,6 +289,8 @@
             transition: transform 0.5s; 
         }
         .flota-card:hover .flota-img img { transform: scale(1.05); }
+        .flota-img img.flip-x { transform: scaleX(-1); }
+        .flota-card:hover .flota-img img.flip-x { transform: scaleX(-1) scale(1.05); }
         
         .flota-content { padding: 36px; flex: 1; }
         .flota-type { font-size: 13px; font-weight: 600; color: var(--opa2-red); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 10px; }
@@ -1919,9 +1921,29 @@
                 precio = ruta.van20;
                 vehiculo = 'Sprinter (11-20 pax)';
             } else {
-                return { precio: null, vehiculo: null, error: 'Máximo 20 pasajeros para Van/Sprinter. Para más, cotización por WhatsApp.' };
+                // Combinaciones (más de 20 pax) usando Sprinter (20) + Van/Hiace (10)
+                var best = null;
+                for (var n20 = 0; n20 <= 10; n20++) {
+                    for (var n10 = 0; n10 <= 10; n10++) {
+                        var capacidad = (n20 * 20) + (n10 * 10);
+                        if (capacidad < pasajeros) continue;
+                        if (capacidad === 0) continue;
+                        var costo = (n20 * ruta.van20) + (n10 * ruta.van10);
+                        if (!best || costo < best.costo || (costo === best.costo && capacidad < best.capacidad)) {
+                            best = { n20: n20, n10: n10, capacidad: capacidad, costo: costo };
+                        }
+                    }
+                }
+                if (!best) {
+                    return { precio: null, vehiculo: null, error: 'No se pudo calcular la combinación. Cotización por WhatsApp.' };
+                }
+                precio = best.costo;
+                var parts = [];
+                if (best.n20 > 0) parts.push('Sprinter x' + best.n20);
+                if (best.n10 > 0) parts.push('Van/Hiace x' + best.n10);
+                vehiculo = parts.join(' + ') + ' (' + pasajeros + ' pax)';
             }
-            
+
             return { precio: precio, vehiculo: vehiculo, nombreDestino: ruta.nombre };
         }
         
