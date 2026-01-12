@@ -91,8 +91,8 @@
             position: relative;
             overflow: hidden;
             padding: 120px 60px 80px;
-            background-size: 85%;
-    background-position: right center;
+            background-size: cover;
+    background-position: center;
     background-repeat: no-repeat;
 }
         
@@ -590,7 +590,27 @@
             }
         }
 
-    </style>
+    
+        /* HERO VEHICLE LAYER */
+        .hero-vehicle {
+            position: absolute;
+            right: 0;
+            bottom: 0;
+            width: min(760px, 52vw);
+            height: auto;
+            z-index: 1;
+            pointer-events: none;
+            filter: drop-shadow(0 24px 40px rgba(0,0,0,0.35));
+            transform: translateX(6%);
+        }
+        @media (max-width: 900px) {
+            .hero-vehicle {
+                width: 72vw;
+                transform: translateX(12%);
+                opacity: 0.95;
+            }
+        }
+</style>
 </head>
 <body>
 
@@ -612,6 +632,8 @@
     </nav>
 
     <section class="hero">
+    <img class="hero-vehicle" src="img/suburban-luxury.png" alt="Luxury SUV" loading="eager">
+
         <div class="hero-content">
             <div class="hero-badge" data-es="Servicio disponible 24/7" data-en="Service available 24/7">Servicio disponible 24/7</div>
             <h1 class="hero-title" data-es="Transportación <span>Premium</span> en la Riviera Maya" data-en="<span>Premium</span> Transportation in the Riviera Maya">Transportación <span>Premium</span> en la Riviera Maya</h1>
