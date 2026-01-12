@@ -430,7 +430,7 @@
             .nav-logo img { height: 60px; }
             .nav-links > a:not(.nav-lang a) { display: none; }
             .flota-grid, .why-grid { grid-template-columns: 1fr; }
-            .hero { background-position: 85% center; background-size: cover; }
+            .hero { background-position: 75% center; background-size: 90% auto; }
             .hero-title { font-size: 32px; }
             .hero-content { padding: 30px 20px; }
             .hero-form-container { padding: 10px 20px 50px; }
@@ -653,7 +653,7 @@
                     </button>
                     <button type="button" class="service-tab" data-service="regional">
                         <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width:18px;height:18px;"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" /></svg>
-                        <span data-es="Point to Point" data-en="Point to Point">Point to Point</span>
+                        <span>Private Transfer</span>
                     </button>
                 </div>
 
@@ -700,15 +700,6 @@
                             <option value="PDC">Playa del Carmen</option>
                             <option value="CANCUN">Cancún</option>
                             <option value="TULUM">Tulum</option>
-                            <option value="PUERTO_MORELOS">Puerto Morelos</option>
-                            <option value="AKUMAL">Akumal</option>
-                            <option value="MERIDA">Mérida</option>
-                            <option value="CHETUMAL">Chetumal</option>
-                            <option value="MAHAHUAL">Mahahual</option>
-                            <option value="VALLADOLID">Valladolid</option>
-                            <option value="BACALAR">Bacalar</option>
-                            <option value="HOLBOX">Holbox</option>
-                            <option value="EL_CUYO">El Cuyo</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -743,7 +734,6 @@
                             <button type="button" class="counter-btn">+</button>
                         </div>
                     </div>
-                    <p style="font-size: 12px; color: var(--opa2-gray); margin-top: 8px;" data-es="*Niños mayores de 2 años cuentan como pasajero" data-en="*Children over 2 years old count as passengers">*Niños mayores de 2 años cuentan como pasajero</p>
                 </div>
                 <div class="form-group">
                     <label class="form-label" data-es="Tipo de servicio" data-en="Service type">Tipo de servicio</label>
@@ -1121,7 +1111,7 @@
                 <h4 class="footer-title" data-es="Contacto" data-en="Contact">Contacto</h4>
                 <ul class="footer-links">
                     <li><a href="tel:+529842160298">+52 984 216 0298</a></li>
-                    <li><a href="/cdn-cgi/l/email-protection#46352936293432232936277406212b272f2a6825292b"><span class="__cf_email__" data-cfemail="6b18041b04191f0e041b0a592b0c060a020745080406">[email&#160;protected]</span></a></li>
+                    <li><a href="/cdn-cgi/l/email-protection#a0d3cfd0cfd2d4c5cfd0c192e0c7cdc1c9cc8ec3cfcd"><span class="__cf_email__" data-cfemail="8efde1fee1fcfaebe1feefbccee9e3efe7e2a0ede1e3">[email&#160;protected]</span></a></li>
                     <li><a href="https://wa.me/529842160298" target="_blank">WhatsApp</a></li>
                 </ul>
             </div>
@@ -1650,204 +1640,58 @@
         // ==========================================
         var PRECIOS = {
             // Desde Aeropuerto Cancún (CUN)
-            'CANCUN_AIRPORT': {
+            'CUN': {
                 'ZH_CANCUN': { van10: 1000, van20: 1300, luxury: 1450, nombre: 'Zona Hotelera Cancún' },
                 'COSTA_MUJERES': { van10: 1200, van20: 1950, luxury: 1740, nombre: 'Costa Mujeres' },
                 'ISLA_BLANCA': { van10: 1400, van20: 1950, luxury: 1957, nombre: 'Isla Blanca' },
-                'PUERTO_MORELOS': { van10: 1300, van20: 1560, luxury: 1450, nombre: 'Puerto Morelos' },
-                'PDC': { van10: 1800, van20: 2470, luxury: 2175, nombre: 'Playa del Carmen' },
-                'AKUMAL': { van10: 1900, van20: 2600, luxury: 2465, nombre: 'Akumal' },
+                'PTO_MORELOS': { van10: 1300, van20: 1560, luxury: 1450, nombre: 'Puerto Morelos' },
+                'PLAYA_CARMEN': { van10: 1800, van20: 2470, luxury: 2175, nombre: 'Playa del Carmen' },
+                'PTO_AVENTURAS': { van10: 1900, van20: 2600, luxury: 2465, nombre: 'Puerto Aventuras / Akumal' },
                 'TULUM': { van10: 2400, van20: 3250, luxury: 3190, nombre: 'Tulum' },
+                'ZH_TULUM': { van10: 2400, van20: 3640, luxury: 3480, nombre: 'Zona Hotelera Tulum' },
                 'MERIDA': { van10: 8500, van20: 18000, luxury: 14500, nombre: 'Mérida' },
                 'CHETUMAL': { van10: 8500, van20: 18000, luxury: 14500, nombre: 'Chetumal' },
-                'MAHAHUAL': { van10: 9000, van20: 19000, luxury: 15000, nombre: 'Mahahual' },
-                'VALLADOLID': { van10: 3500, van20: 5200, luxury: 5000, nombre: 'Valladolid' },
-                'BACALAR': { van10: 8000, van20: 17000, luxury: 13500, nombre: 'Bacalar' },
-                'HOLBOX': { van10: 3900, van20: 6240, luxury: 6090, nombre: 'Holbox' },
-                'EL_CUYO': { van10: 3500, van20: 5800, luxury: 5500, nombre: 'El Cuyo' }
+                'CHIQUILA': { van10: 3900, van20: 6240, luxury: 6090, nombre: 'Chiquilá (Holbox)' }
             },
             // Desde Aeropuerto Tulum (TQO)
-            'TULUM_AIRPORT': {
-                'CANCUN': { van10: 4500, van20: 6500, luxury: 6525, nombre: 'Cancún (Zona Hotelera)' },
-                'PUERTO_MORELOS': { van10: 3900, van20: 5980, luxury: 5800, nombre: 'Puerto Morelos' },
-                'PDC': { van10: 2860, van20: 4940, luxury: 4785, nombre: 'Playa del Carmen' },
-                'AKUMAL': { van10: 2800, van20: 4550, luxury: 4350, nombre: 'Akumal' },
-                'TULUM': { van10: 1800, van20: 2340, luxury: 1740, nombre: 'Tulum (Centro)' },
+            'TQO': {
+                'ZH_CANCUN': { van10: 4500, van20: 6500, luxury: 6525, nombre: 'Zona Hotelera Cancún' },
+                'COSTA_MUJERES': { van10: 5000, van20: 7800, luxury: 7250, nombre: 'Costa Mujeres' },
+                'ISLA_BLANCA': { van10: 5100, van20: 7800, luxury: 7250, nombre: 'Isla Blanca' },
+                'PTO_MORELOS': { van10: 3900, van20: 5980, luxury: 5800, nombre: 'Puerto Morelos' },
+                'PLAYA_CARMEN': { van10: 2860, van20: 4940, luxury: 4785, nombre: 'Playa del Carmen' },
+                'PTO_AVENTURAS': { van10: 2800, van20: 4550, luxury: 4350, nombre: 'Puerto Aventuras / Akumal' },
+                'TULUM_CENTRO': { van10: 1800, van20: 2340, luxury: 1740, nombre: 'Tulum Centro' },
+                'ZH_TULUM': { van10: 2200, van20: 2860, luxury: 2320, nombre: 'Zona Hotelera Tulum' },
                 'MERIDA': { van10: 10000, van20: 22000, luxury: 14500, nombre: 'Mérida' },
                 'CHETUMAL': { van10: 8000, van20: 15600, luxury: 11600, nombre: 'Chetumal' },
-                'MAHAHUAL': { van10: 8500, van20: 16500, luxury: 12500, nombre: 'Mahahual' },
-                'VALLADOLID': { van10: 4000, van20: 6000, luxury: 5500, nombre: 'Valladolid' },
-                'BACALAR': { van10: 7500, van20: 14500, luxury: 11000, nombre: 'Bacalar' },
-                'HOLBOX': { van10: 5850, van20: 11700, luxury: 11600, nombre: 'Holbox' },
-                'EL_CUYO': { van10: 5000, van20: 9500, luxury: 9000, nombre: 'El Cuyo' }
+                'CHIQUILA': { van10: 5850, van20: 11700, luxury: 11600, nombre: 'Chiquilá (Holbox)' }
             },
             // Desde Playa del Carmen
             'PDC': {
                 'CANCUN': { van10: 1800, van20: 2600, luxury: 2610, nombre: 'Cancún' },
-                'PUERTO_MORELOS': { van10: 1000, van20: 1400, luxury: 1300, nombre: 'Puerto Morelos' },
-                'AKUMAL': { van10: 1200, van20: 1690, luxury: 1667, nombre: 'Akumal' },
+                'CHIQUILA': { van10: 3900, van20: 5980, luxury: 5800, nombre: 'Chiquilá (Holbox)' },
                 'TULUM': { van10: 1800, van20: 2340, luxury: 2320, nombre: 'Tulum' },
+                'PTO_AVENTURAS': { van10: 1200, van20: 1690, luxury: 1667, nombre: 'Puerto Aventuras / Akumal' },
                 'MERIDA': { van10: 9000, van20: 12350, luxury: 10150, nombre: 'Mérida' },
-                'CHETUMAL': { van10: 7500, van20: 15000, luxury: 12000, nombre: 'Chetumal' },
-                'MAHAHUAL': { van10: 8000, van20: 16000, luxury: 13000, nombre: 'Mahahual' },
-                'VALLADOLID': { van10: 3000, van20: 4500, luxury: 4200, nombre: 'Valladolid' },
-                'BACALAR': { van10: 7000, van20: 14000, luxury: 11500, nombre: 'Bacalar' },
-                'HOLBOX': { van10: 3900, van20: 5980, luxury: 5800, nombre: 'Holbox' },
-                'EL_CUYO': { van10: 3500, van20: 5500, luxury: 5200, nombre: 'El Cuyo' }
+                'XOXIMILCO': { van10: 1800, van20: 3250, luxury: 2610, nombre: 'Xoximilco' },
+                'XCARET': { van10: 1000, van20: 1170, luxury: 1305, nombre: 'Xcaret / Xplor / Xenses' },
+                'XELHA': { van10: 1800, van20: 2340, luxury: 2465, nombre: 'Xel-Há' },
+                'CHICHEN': { van10: 8500, van20: 13000, luxury: 13050, nombre: 'Chichén Itzá' }
             },
             // Desde Cancún
             'CANCUN': {
-                'PDC': { van10: 1800, van20: 2600, luxury: 2610, nombre: 'Playa del Carmen' },
-                'PUERTO_MORELOS': { van10: 900, van20: 1200, luxury: 1150, nombre: 'Puerto Morelos' },
-                'AKUMAL': { van10: 2200, van20: 3000, luxury: 2900, nombre: 'Akumal' },
-                'TULUM': { van10: 2800, van20: 3800, luxury: 3700, nombre: 'Tulum' },
-                'MERIDA': { van10: 9500, van20: 13000, luxury: 11000, nombre: 'Mérida' },
-                'CHETUMAL': { van10: 9000, van20: 19000, luxury: 15000, nombre: 'Chetumal' },
-                'MAHAHUAL': { van10: 9500, van20: 20000, luxury: 16000, nombre: 'Mahahual' },
-                'VALLADOLID': { van10: 3500, van20: 5200, luxury: 5000, nombre: 'Valladolid' },
-                'BACALAR': { van10: 8500, van20: 18000, luxury: 14000, nombre: 'Bacalar' },
-                'HOLBOX': { van10: 4200, van20: 6800, luxury: 6500, nombre: 'Holbox' },
-                'EL_CUYO': { van10: 3800, van20: 6200, luxury: 5800, nombre: 'El Cuyo' }
+                'XOXIMILCO': { van10: 1200, van20: 1690, luxury: 1450, nombre: 'Xoximilco' },
+                'XCARET': { van10: 1950, van20: 3640, luxury: 2900, nombre: 'Xcaret / Xplor / Xenses' },
+                'XELHA': { van10: 3500, van20: 4420, luxury: 4350, nombre: 'Xel-Há' },
+                'CHICHEN': { van10: 8500, van20: 13000, luxury: 13050, nombre: 'Chichén Itzá (Tour 6hrs)' }
             },
             // Desde Tulum
             'TULUM': {
-                'CANCUN': { van10: 2800, van20: 3800, luxury: 3700, nombre: 'Cancún' },
-                'PDC': { van10: 1800, van20: 2340, luxury: 2320, nombre: 'Playa del Carmen' },
-                'PUERTO_MORELOS': { van10: 2200, van20: 3000, luxury: 2900, nombre: 'Puerto Morelos' },
-                'AKUMAL': { van10: 1200, van20: 1600, luxury: 1550, nombre: 'Akumal' },
-                'MERIDA': { van10: 10500, van20: 15000, luxury: 13000, nombre: 'Mérida' },
-                'CHETUMAL': { van10: 7000, van20: 14000, luxury: 11000, nombre: 'Chetumal' },
-                'MAHAHUAL': { van10: 7500, van20: 15000, luxury: 12000, nombre: 'Mahahual' },
-                'VALLADOLID': { van10: 4000, van20: 6000, luxury: 5500, nombre: 'Valladolid' },
-                'BACALAR': { van10: 6500, van20: 13000, luxury: 10500, nombre: 'Bacalar' },
-                'HOLBOX': { van10: 6000, van20: 12000, luxury: 11500, nombre: 'Holbox' },
-                'EL_CUYO': { van10: 5500, van20: 10500, luxury: 10000, nombre: 'El Cuyo' }
-            },
-            // Desde Puerto Morelos
-            'PUERTO_MORELOS': {
-                'CANCUN': { van10: 900, van20: 1200, luxury: 1150, nombre: 'Cancún' },
-                'PDC': { van10: 1000, van20: 1400, luxury: 1300, nombre: 'Playa del Carmen' },
-                'AKUMAL': { van10: 1800, van20: 2400, luxury: 2300, nombre: 'Akumal' },
-                'TULUM': { van10: 2200, van20: 3000, luxury: 2900, nombre: 'Tulum' },
-                'MERIDA': { van10: 9200, van20: 13500, luxury: 11500, nombre: 'Mérida' },
-                'CHETUMAL': { van10: 8500, van20: 18000, luxury: 14500, nombre: 'Chetumal' },
-                'MAHAHUAL': { van10: 9000, van20: 19000, luxury: 15500, nombre: 'Mahahual' },
-                'VALLADOLID': { van10: 3200, van20: 4800, luxury: 4500, nombre: 'Valladolid' },
-                'BACALAR': { van10: 8000, van20: 17000, luxury: 13500, nombre: 'Bacalar' },
-                'HOLBOX': { van10: 4000, van20: 6500, luxury: 6200, nombre: 'Holbox' },
-                'EL_CUYO': { van10: 3600, van20: 5900, luxury: 5600, nombre: 'El Cuyo' }
-            },
-            // Desde Akumal
-            'AKUMAL': {
-                'CANCUN': { van10: 2200, van20: 3000, luxury: 2900, nombre: 'Cancún' },
-                'PDC': { van10: 1200, van20: 1690, luxury: 1667, nombre: 'Playa del Carmen' },
-                'PUERTO_MORELOS': { van10: 1800, van20: 2400, luxury: 2300, nombre: 'Puerto Morelos' },
-                'TULUM': { van10: 1200, van20: 1600, luxury: 1550, nombre: 'Tulum' },
-                'MERIDA': { van10: 10000, van20: 14000, luxury: 12000, nombre: 'Mérida' },
-                'CHETUMAL': { van10: 7500, van20: 15000, luxury: 12000, nombre: 'Chetumal' },
-                'MAHAHUAL': { van10: 8000, van20: 16000, luxury: 13000, nombre: 'Mahahual' },
-                'VALLADOLID': { van10: 3500, van20: 5200, luxury: 4800, nombre: 'Valladolid' },
-                'BACALAR': { van10: 7000, van20: 14000, luxury: 11000, nombre: 'Bacalar' },
-                'HOLBOX': { van10: 5500, van20: 11000, luxury: 10500, nombre: 'Holbox' },
-                'EL_CUYO': { van10: 5000, van20: 10000, luxury: 9500, nombre: 'El Cuyo' }
-            },
-            // Desde Mérida
-            'MERIDA': {
-                'CANCUN': { van10: 9500, van20: 13000, luxury: 11000, nombre: 'Cancún' },
-                'PDC': { van10: 9000, van20: 12350, luxury: 10150, nombre: 'Playa del Carmen' },
-                'PUERTO_MORELOS': { van10: 9200, van20: 13500, luxury: 11500, nombre: 'Puerto Morelos' },
-                'AKUMAL': { van10: 10000, van20: 14000, luxury: 12000, nombre: 'Akumal' },
-                'TULUM': { van10: 10500, van20: 15000, luxury: 13000, nombre: 'Tulum' },
-                'CHETUMAL': { van10: 8000, van20: 14000, luxury: 11500, nombre: 'Chetumal' },
-                'MAHAHUAL': { van10: 9000, van20: 16000, luxury: 13000, nombre: 'Mahahual' },
-                'VALLADOLID': { van10: 2500, van20: 3800, luxury: 3500, nombre: 'Valladolid' },
-                'BACALAR': { van10: 7500, van20: 13000, luxury: 10500, nombre: 'Bacalar' },
-                'HOLBOX': { van10: 7000, van20: 12000, luxury: 10000, nombre: 'Holbox' },
-                'EL_CUYO': { van10: 4500, van20: 7500, luxury: 7000, nombre: 'El Cuyo' }
-            },
-            // Desde Chetumal
-            'CHETUMAL': {
-                'CANCUN': { van10: 9000, van20: 19000, luxury: 15000, nombre: 'Cancún' },
-                'PDC': { van10: 7500, van20: 15000, luxury: 12000, nombre: 'Playa del Carmen' },
-                'PUERTO_MORELOS': { van10: 8500, van20: 18000, luxury: 14500, nombre: 'Puerto Morelos' },
-                'AKUMAL': { van10: 7500, van20: 15000, luxury: 12000, nombre: 'Akumal' },
-                'TULUM': { van10: 7000, van20: 14000, luxury: 11000, nombre: 'Tulum' },
-                'MERIDA': { van10: 8000, van20: 14000, luxury: 11500, nombre: 'Mérida' },
-                'MAHAHUAL': { van10: 2000, van20: 3500, luxury: 3200, nombre: 'Mahahual' },
-                'VALLADOLID': { van10: 5500, van20: 9500, luxury: 8500, nombre: 'Valladolid' },
-                'BACALAR': { van10: 1500, van20: 2500, luxury: 2300, nombre: 'Bacalar' },
-                'HOLBOX': { van10: 10000, van20: 20000, luxury: 16000, nombre: 'Holbox' },
-                'EL_CUYO': { van10: 9000, van20: 18000, luxury: 15000, nombre: 'El Cuyo' }
-            },
-            // Desde Mahahual
-            'MAHAHUAL': {
-                'CANCUN': { van10: 9500, van20: 20000, luxury: 16000, nombre: 'Cancún' },
-                'PDC': { van10: 8000, van20: 16000, luxury: 13000, nombre: 'Playa del Carmen' },
-                'PUERTO_MORELOS': { van10: 9000, van20: 19000, luxury: 15500, nombre: 'Puerto Morelos' },
-                'AKUMAL': { van10: 8000, van20: 16000, luxury: 13000, nombre: 'Akumal' },
-                'TULUM': { van10: 7500, van20: 15000, luxury: 12000, nombre: 'Tulum' },
-                'MERIDA': { van10: 9000, van20: 16000, luxury: 13000, nombre: 'Mérida' },
-                'CHETUMAL': { van10: 2000, van20: 3500, luxury: 3200, nombre: 'Chetumal' },
-                'VALLADOLID': { van10: 6000, van20: 10500, luxury: 9500, nombre: 'Valladolid' },
-                'BACALAR': { van10: 2500, van20: 4000, luxury: 3700, nombre: 'Bacalar' },
-                'HOLBOX': { van10: 11000, van20: 22000, luxury: 18000, nombre: 'Holbox' },
-                'EL_CUYO': { van10: 10000, van20: 20000, luxury: 16500, nombre: 'El Cuyo' }
-            },
-            // Desde Valladolid
-            'VALLADOLID': {
-                'CANCUN': { van10: 3500, van20: 5200, luxury: 5000, nombre: 'Cancún' },
-                'PDC': { van10: 3000, van20: 4500, luxury: 4200, nombre: 'Playa del Carmen' },
-                'PUERTO_MORELOS': { van10: 3200, van20: 4800, luxury: 4500, nombre: 'Puerto Morelos' },
-                'AKUMAL': { van10: 3500, van20: 5200, luxury: 4800, nombre: 'Akumal' },
-                'TULUM': { van10: 4000, van20: 6000, luxury: 5500, nombre: 'Tulum' },
-                'MERIDA': { van10: 2500, van20: 3800, luxury: 3500, nombre: 'Mérida' },
-                'CHETUMAL': { van10: 5500, van20: 9500, luxury: 8500, nombre: 'Chetumal' },
-                'MAHAHUAL': { van10: 6000, van20: 10500, luxury: 9500, nombre: 'Mahahual' },
-                'BACALAR': { van10: 5000, van20: 8500, luxury: 7500, nombre: 'Bacalar' },
-                'HOLBOX': { van10: 5500, van20: 10000, luxury: 9500, nombre: 'Holbox' },
-                'EL_CUYO': { van10: 2500, van20: 4500, luxury: 4200, nombre: 'El Cuyo' }
-            },
-            // Desde Bacalar
-            'BACALAR': {
-                'CANCUN': { van10: 8500, van20: 18000, luxury: 14000, nombre: 'Cancún' },
-                'PDC': { van10: 7000, van20: 14000, luxury: 11500, nombre: 'Playa del Carmen' },
-                'PUERTO_MORELOS': { van10: 8000, van20: 17000, luxury: 13500, nombre: 'Puerto Morelos' },
-                'AKUMAL': { van10: 7000, van20: 14000, luxury: 11000, nombre: 'Akumal' },
-                'TULUM': { van10: 6500, van20: 13000, luxury: 10500, nombre: 'Tulum' },
-                'MERIDA': { van10: 7500, van20: 13000, luxury: 10500, nombre: 'Mérida' },
-                'CHETUMAL': { van10: 1500, van20: 2500, luxury: 2300, nombre: 'Chetumal' },
-                'MAHAHUAL': { van10: 2500, van20: 4000, luxury: 3700, nombre: 'Mahahual' },
-                'VALLADOLID': { van10: 5000, van20: 8500, luxury: 7500, nombre: 'Valladolid' },
-                'HOLBOX': { van10: 10000, van20: 20000, luxury: 16500, nombre: 'Holbox' },
-                'EL_CUYO': { van10: 9000, van20: 18000, luxury: 15000, nombre: 'El Cuyo' }
-            },
-            // Desde Holbox
-            'HOLBOX': {
-                'CANCUN': { van10: 4200, van20: 6800, luxury: 6500, nombre: 'Cancún' },
-                'PDC': { van10: 3900, van20: 5980, luxury: 5800, nombre: 'Playa del Carmen' },
-                'PUERTO_MORELOS': { van10: 4000, van20: 6500, luxury: 6200, nombre: 'Puerto Morelos' },
-                'AKUMAL': { van10: 5500, van20: 11000, luxury: 10500, nombre: 'Akumal' },
-                'TULUM': { van10: 6000, van20: 12000, luxury: 11500, nombre: 'Tulum' },
-                'MERIDA': { van10: 7000, van20: 12000, luxury: 10000, nombre: 'Mérida' },
-                'CHETUMAL': { van10: 10000, van20: 20000, luxury: 16000, nombre: 'Chetumal' },
-                'MAHAHUAL': { van10: 11000, van20: 22000, luxury: 18000, nombre: 'Mahahual' },
-                'VALLADOLID': { van10: 5500, van20: 10000, luxury: 9500, nombre: 'Valladolid' },
-                'BACALAR': { van10: 10000, van20: 20000, luxury: 16500, nombre: 'Bacalar' },
-                'EL_CUYO': { van10: 3500, van20: 6000, luxury: 5800, nombre: 'El Cuyo' }
-            },
-            // Desde El Cuyo
-            'EL_CUYO': {
-                'CANCUN': { van10: 3800, van20: 6200, luxury: 5800, nombre: 'Cancún' },
-                'PDC': { van10: 3500, van20: 5500, luxury: 5200, nombre: 'Playa del Carmen' },
-                'PUERTO_MORELOS': { van10: 3600, van20: 5900, luxury: 5600, nombre: 'Puerto Morelos' },
-                'AKUMAL': { van10: 5000, van20: 10000, luxury: 9500, nombre: 'Akumal' },
-                'TULUM': { van10: 5500, van20: 10500, luxury: 10000, nombre: 'Tulum' },
-                'MERIDA': { van10: 4500, van20: 7500, luxury: 7000, nombre: 'Mérida' },
-                'CHETUMAL': { van10: 9000, van20: 18000, luxury: 15000, nombre: 'Chetumal' },
-                'MAHAHUAL': { van10: 10000, van20: 20000, luxury: 16500, nombre: 'Mahahual' },
-                'VALLADOLID': { van10: 2500, van20: 4500, luxury: 4200, nombre: 'Valladolid' },
-                'BACALAR': { van10: 9000, van20: 18000, luxury: 15000, nombre: 'Bacalar' },
-                'HOLBOX': { van10: 3500, van20: 6000, luxury: 5800, nombre: 'Holbox' }
+                'XOXIMILCO': { van10: 3000, van20: 4550, luxury: 4785, nombre: 'Xoximilco' },
+                'XCARET': { van10: 1800, van20: 2340, luxury: 2900, nombre: 'Xcaret / Xplor / Xenses' },
+                'XELHA': { van10: 1500, van20: 2340, luxury: 2610, nombre: 'Xel-Há' },
+                'CHICHEN': { van10: 8500, van20: 13000, luxury: 13050, nombre: 'Chichén Itzá' }
             }
         };
 
@@ -1902,15 +1746,9 @@
             var precio;
             var vehiculo;
             
-            if (isLuxury) {
-                if (pasajeros <= 5) {
-                    precio = ruta.luxury;
-                    vehiculo = 'Luxury (1-5 pax)';
-                } else {
-                    // MÁS DE 5 PASAJEROS = 2 SUBURBANS
-                    precio = ruta.luxury * 2;
-                    vehiculo = 'Luxury x2 (6+ pax)';
-                }
+            if (isLuxury && pasajeros <= 5) {
+                precio = ruta.luxury;
+                vehiculo = 'Luxury (1-5 pax)';
             } else if (pasajeros <= 10) {
                 precio = ruta.van10;
                 vehiculo = 'Van (1-10 pax)';
@@ -1946,15 +1784,9 @@
             var precioBase;
             var vehiculo;
             
-            if (isLuxury) {
-                if (pasajeros <= 5) {
-                    precioBase = ruta.luxury;
-                    vehiculo = 'Luxury (1-5 pax)';
-                } else {
-                    // MÁS DE 5 PASAJEROS = 2 SUBURBANS
-                    precioBase = ruta.luxury * 2;
-                    vehiculo = 'Luxury x2 (6+ pax)';
-                }
+            if (isLuxury && pasajeros <= 5) {
+                precioBase = ruta.luxury;
+                vehiculo = 'Luxury (1-5 pax)';
             } else if (pasajeros <= 10) {
                 precioBase = ruta.van10;
                 vehiculo = 'Van (1-10 pax)';
@@ -2012,18 +1844,6 @@
                 this.classList.add('active');
                 // Mostrar/ocultar campos retorno
                 toggleReturnFields();
-            });
-        }
-
-        // Handler para link "Otro destino" → WhatsApp
-        var whatsappCustomLink = document.getElementById('whatsapp-custom');
-        if (whatsappCustomLink) {
-            whatsappCustomLink.addEventListener('click', function(e) {
-                e.preventDefault();
-                var msg = currentLang === 'es' ? 
-                    'Hola, necesito cotización para un destino específico que no aparece en la lista.' :
-                    'Hello, I need a quote for a specific destination not listed.';
-                window.open('https://wa.me/' + WHATSAPP_NUMBER + '?text=' + encodeURIComponent(msg), '_blank');
             });
         }
 
@@ -2140,59 +1960,6 @@
             var timeInput = document.getElementById('hora-ida');
             var returnDateInput = document.getElementById('fecha-retorno');
             var returnTimeInput = document.getElementById('hora-retorno');
-            
-            // VALIDACIÓN 1: Fecha de ida no puede ser en el pasado
-            if (dateInput && dateInput.value) {
-                var fechaIda = new Date(dateInput.value + 'T00:00:00');
-                var hoy = new Date();
-                hoy.setHours(0, 0, 0, 0);
-                
-                if (fechaIda < hoy) {
-                    alert(currentLang === 'es' ? 'La fecha de salida no puede ser en el pasado' : 'Departure date cannot be in the past');
-                    return;
-                }
-                
-                // VALIDACIÓN 2: Si es hoy, validar que la hora no sea pasada
-                if (fechaIda.getTime() === hoy.getTime() && timeInput && timeInput.value) {
-                    var horaIda = timeInput.value.split(':');
-                    var ahora = new Date();
-                    var horaIdaDate = new Date();
-                    horaIdaDate.setHours(parseInt(horaIda[0]), parseInt(horaIda[1]), 0, 0);
-                    
-                    if (horaIdaDate < ahora) {
-                        alert(currentLang === 'es' ? 'La hora de salida no puede ser en el pasado' : 'Departure time cannot be in the past');
-                        return;
-                    }
-                }
-            }
-            
-            // VALIDACIÓN 3: Fecha de retorno no puede ser antes que fecha de ida
-            var activeFormTab = document.querySelector('.form-tab.active');
-            var isRoundTrip = activeFormTab && (activeFormTab.innerText.indexOf('Redondo') !== -1 || activeFormTab.innerText.indexOf('Round') !== -1);
-            
-            if (isRoundTrip && returnDateInput && returnDateInput.value && dateInput && dateInput.value) {
-                var fechaRetorno = new Date(returnDateInput.value + 'T00:00:00');
-                var fechaIdaCompare = new Date(dateInput.value + 'T00:00:00');
-                
-                if (fechaRetorno < fechaIdaCompare) {
-                    alert(currentLang === 'es' ? 'La fecha de retorno no puede ser anterior a la fecha de salida' : 'Return date cannot be before departure date');
-                    return;
-                }
-                
-                // VALIDACIÓN 4: Si son el mismo día, validar que hora de retorno sea después de ida
-                if (fechaRetorno.getTime() === fechaIdaCompare.getTime() && timeInput && timeInput.value && returnTimeInput && returnTimeInput.value) {
-                    var horaIdaArr = timeInput.value.split(':');
-                    var horaRetornoArr = returnTimeInput.value.split(':');
-                    var horaIdaMinutos = parseInt(horaIdaArr[0]) * 60 + parseInt(horaIdaArr[1]);
-                    var horaRetornoMinutos = parseInt(horaRetornoArr[0]) * 60 + parseInt(horaRetornoArr[1]);
-                    
-                    if (horaRetornoMinutos <= horaIdaMinutos) {
-                        alert(currentLang === 'es' ? 'La hora de retorno debe ser después de la hora de salida' : 'Return time must be after departure time');
-                        return;
-                    }
-                }
-            }
-            
             var dateStr = currentLang === 'es' ? 'Fecha no especificada' : 'Date not specified';
             var fechaRaw = '';
             var horaRaw = '';
