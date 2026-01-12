@@ -80,8 +80,6 @@
         .nav-lang a.active { background: var(--opa2-red); color: white; }
 
         /* HERO */
-
-        .flip-x { transform: scaleX(-1); }
         .hero {
             min-height: 100vh; 
             display: flex;
@@ -89,7 +87,7 @@
             background: linear-gradient(135deg, rgba(26,26,26,0.65) 0%, rgba(26,26,26,0.45) 100%),
                         url('img/Luxury_Bakcground.png');
             background-size: cover;
-            background-position: 70% center;
+            background-position: center;
             background-repeat: no-repeat;
             position: relative;
             overflow: hidden;
@@ -432,7 +430,7 @@
             .nav-logo img { height: 60px; }
             .nav-links > a:not(.nav-lang a) { display: none; }
             .flota-grid, .why-grid { grid-template-columns: 1fr; }
-            .hero { background-position: 85% center; background-size: cover; }
+            .hero { background-position: 75% center; background-size: 85% auto; }
             .hero-title { font-size: 32px; }
             .hero-content { padding: 30px 20px; }
             .hero-form-container { padding: 10px 20px 50px; }
@@ -806,7 +804,7 @@
             <!-- OPA2 LUXURY -->
             <div class="flota-card">
                 <div class="flota-img">
-                    <img src="img/suburban-luxury-flipped.png" alt="OPA2 Luxury" class="flip-x">
+                    <img src="img/suburban-luxury-flipped.png" alt="OPA2 Luxury">
                 </div>
                 <div class="flota-content">
                     <p class="flota-type">Premium Private</p>
@@ -841,7 +839,7 @@
                         <div class="carousel-3d-item-name">Sprinter</div>
                     </div>
                     <div class="carousel-3d-item" data-index="3">
-                        <div class="carousel-3d-item-img"><img src="img/carr-suburban.png" alt="Suburban" class="flip-x"></div>
+                        <div class="carousel-3d-item-img"><img src="img/carr-suburban.png" alt="Suburban"></div>
                         <div class="carousel-3d-item-name">Suburban</div>
                     </div>
                     <div class="carousel-3d-item" data-index="4">
@@ -2085,14 +2083,6 @@
 
         // Form submit - show quote modal with real data
         var formSubmit = document.querySelector('.form-submit');
-        var bookingForm = document.querySelector('.booking-form');
-        if (bookingForm && formSubmit) {
-            bookingForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                formSubmit.click();
-            });
-        }
-
         formSubmit.onclick = function(e) {
             e.preventDefault();
             
@@ -2232,7 +2222,7 @@
             // Get service level (Estándar/Luxury)
             var serviceLevelSelect = document.querySelectorAll('.form-select');
             var lastSelect = serviceLevelSelect[serviceLevelSelect.length - 1];
-            var isLuxury = lastSelect && lastSelect.value === 'luxury';
+            var isLuxury = lastSelect && lastSelect.value === 'elite';
             var serviceLevel = isLuxury ? 'Luxury' : 'Estándar';
             
             // Calcular precio - siempre usar dropdown de destino
