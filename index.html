@@ -83,22 +83,18 @@
 
         .flip-x { transform: scaleX(-1); }
         .hero {
-    background-image: url('img/hero-tulum.png');
-    background-size: contain;
-    background-position: right center;
-    background-repeat: no-repeat;
-min-height: 100vh; 
+            min-height: 100vh;
             display: flex;
             align-items: center;
-            background: linear-gradient(135deg, rgba(26,26,26,0.65) 0%, rgba(26,26,26,0.45) 100%),
-                        url('img/Luxury_Bakcground.png');
-            background-size: contain;
+            background: linear-gradient(135deg, rgba(26,26,26,0.65) 0%, rgba(26,26,26,0.35) 100%), url('img/Luxury_Bakcground.png');
+            background-repeat: no-repeat;
+            background-size: cover;
             background-position: right center;
             position: relative;
             overflow: hidden;
             padding: 120px 60px 80px;
-            }
-        
+        }
+
         /* Voronoi sutil sobre la foto */
         .hero::before {
             content: '';
