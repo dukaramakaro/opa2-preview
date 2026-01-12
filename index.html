@@ -596,20 +596,24 @@
             position: absolute;
             right: 0;
             bottom: 0;
-            width: min(760px, 52vw);
+            width: min(900px, 56vw);
+            max-height: 100%;
             height: auto;
+            object-fit: contain;
             z-index: 1;
             pointer-events: none;
             filter: drop-shadow(0 24px 40px rgba(0,0,0,0.35));
             transform: translateX(6%);
         }
-        @media (max-width: 900px) {
+        @media (max-width: 900px) { (max-width: 900px) {
             .hero-vehicle {
                 width: 72vw;
                 transform: translateX(12%);
                 opacity: 0.95;
             }
         }
+
+        .hero .container { position: relative; z-index: 2; }
 </style>
 </head>
 <body>
@@ -632,7 +636,7 @@
     </nav>
 
     <section class="hero">
-    <img class="hero-vehicle" src="img/suburban-luxury.png" alt="Luxury SUV" loading="eager">
+    <img class="hero-vehicle" src="img/hero-tulum.png" alt="Luxury SUV" loading="eager">
 
         <div class="hero-content">
             <div class="hero-badge" data-es="Servicio disponible 24/7" data-en="Service available 24/7">Servicio disponible 24/7</div>
