@@ -82,19 +82,23 @@
         /* HERO */
 
         .flip-x { transform: scaleX(-1); }
-        .hero {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            background: linear-gradient(135deg, rgba(26,26,26,0.65) 0%, rgba(26,26,26,0.35) 100%), url('img/Luxury_Bakcground.png');
-            background-repeat: no-repeat;
-            background-size: cover;
-            background-position: right center;
-            position: relative;
-            overflow: hidden;
-            padding: 120px 60px 80px;
-        }
-
+		        .hero {
+		            /* iOS Safari: usa unidades "svh" para evitar saltos por la barra */
+		            min-height: 100vh;
+		            min-height: 100svh;
+	            display: flex;
+	            align-items: center;
+	            position: relative;
+	            overflow: hidden;
+	            padding: 120px 60px 80px;
+	            background-image:
+	                linear-gradient(135deg, rgba(26,26,26,0.65) 0%, rgba(26,26,26,0.45) 100%),
+	                url('img/Luxury_Bakcground.png');
+	            background-repeat: no-repeat;
+	            background-size: cover;
+	            background-position: right center;
+	        }
+        
         /* Voronoi sutil sobre la foto */
         .hero::before {
             content: '';
@@ -432,8 +436,16 @@
             .nav { padding: 0 20px; height: 90px; }
             .nav-logo img { height: 60px; }
             .nav-links > a:not(.nav-lang a) { display: none; }
-            .flota-grid, .why-grid { grid-template-columns: 1fr; }
-            .hero { background-position: 65% center; background-size: cover; }
+		            .flota-grid, .why-grid { grid-template-columns: 1fr; }
+		            /* Mobile: evita repetición y acomoda el encuadre sin dejar "parches" */
+		            .hero {
+		                background-repeat: no-repeat;
+		                background-size: cover;
+		                background-position: 70% 50%;
+		                background-color: #0b0f14;
+		            }
+		            /* Baja un poco la intensidad del patrón para que no se vea como cuadro gris */
+		            .hero::before { opacity: 0.18; }
             .hero-title { font-size: 32px; }
             .hero-content { padding: 30px 20px; }
             .hero-form-container { padding: 10px 20px 50px; }
