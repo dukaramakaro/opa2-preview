@@ -432,6 +432,18 @@
             .booking-timeline::before { display: none; }
             .timeline-step { flex: 0 0 calc(50% - 10px); }
         }
+
+        /* Tablets grandes en vertical (iPad Pro, etc.): muestra más imagen y evita el “zoom” agresivo */
+        @media (max-width: 1200px) and (min-width: 901px) and (orientation: portrait) {
+            .hero {
+                background-repeat: no-repeat;
+                background-size: contain;
+                background-position: center top;
+                background-color: #0b0f14;
+            }
+            .hero::before { opacity: 0.12; }
+        }
+
         @media (max-width: 768px) {
             .nav { padding: 0 20px; height: 90px; }
             .nav-logo img { height: 60px; }
@@ -459,6 +471,18 @@
             .booking-actions { flex-direction: column; }
             .timeline-step { flex: 0 0 100%; }
             section { padding: 50px 20px; }
+        }
+
+        /* Cotizador: en pantallas pequeñas, evita que FECHA/HORA se salgan del contenedor */
+        @media (max-width: 520px) {
+            .form-row { grid-template-columns: 1fr; }
+            .form-group { min-width: 0; }
+            .form-input, .form-select {
+                width: 100%;
+                max-width: 100%;
+                box-sizing: border-box;
+            }
+            input[type="time"].form-input { min-width: 0; }
         }
         /* CARROUSEL 3D */
         .carousel-section { margin-top: 80px; padding: 80px 0; background: var(--opa2-cream); border-radius: 24px; max-width: 1200px; margin-left: auto; margin-right: auto; }
