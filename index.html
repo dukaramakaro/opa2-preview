@@ -39,8 +39,7 @@
         body { 
             font-family: 'Sora', sans-serif; 
             background: linear-gradient(135deg, #ffffff 0%, #f8f8f8 100%);
-            /* iOS Safari rompe backgrounds fijos: evita cuadros grises */
-            background-attachment: scroll;
+            background-attachment: fixed;
             color: var(--opa2-black);
             position: relative;
             touch-action: pan-y;
@@ -87,36 +86,27 @@
             min-height: 100vh;
             display: flex;
             align-items: center;
+            background: linear-gradient(135deg, rgba(26,26,26,0.65) 0%, rgba(26,26,26,0.35) 100%), url('img/Luxury_Bakcground.png');
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-position: right center;
             position: relative;
             overflow: hidden;
             padding: 120px 60px 80px;
         }
 
-        /* Fondo del hero en capas para evitar glitches de Safari iOS */
-        .hero::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background-image: url('img/Luxury_Bakcground.png');
-            background-repeat: no-repeat;
-            background-size: cover;
-            background-position: right center;
-            z-index: 0;
-            transform: translateZ(0);
-        }
-
+        /* Voronoi sutil sobre la foto */
         .hero::before {
             content: '';
             position: absolute;
-            inset: 0;
-            background-image:
-                linear-gradient(135deg, rgba(26,26,26,0.65) 0%, rgba(26,26,26,0.35) 100%),
-                url('data:image/svg+xml,<svg width="400" height="400" xmlns="http://www.w3.org/2000/svg"><path d="M0,0 L120,0 L80,90 L30,110 Z M120,0 L240,0 L200,80 L120,90 Z M240,0 L400,0 L350,120 L240,100 Z M0,110 L80,90 L120,180 L40,200 Z M80,90 L200,80 L180,170 L120,180 Z M200,80 L350,120 L320,190 L180,170 Z M0,200 L40,200 L60,290 L0,320 Z M40,200 L180,170 L150,280 L60,290 Z M180,170 L320,190 L280,300 L150,280 Z M320,190 L400,120 L400,310 L280,300 Z M0,320 L60,290 L100,400 L0,400 Z M60,290 L150,280 L180,380 L100,400 Z M150,280 L280,300 L260,400 L180,380 Z M280,300 L400,310 L400,400 L260,400 Z" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="2"/></svg>');
-            background-repeat: no-repeat, repeat;
-            background-size: cover, 350px 350px;
-            background-position: center, center;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url('data:image/svg+xml,<svg width="400" height="400" xmlns="http://www.w3.org/2000/svg"><path d="M0,0 L120,0 L80,90 L30,110 Z M120,0 L240,0 L200,80 L120,90 Z M240,0 L400,0 L350,120 L240,100 Z M0,110 L80,90 L120,180 L40,200 Z M80,90 L200,80 L180,170 L120,180 Z M200,80 L350,120 L320,190 L180,170 Z M0,200 L40,200 L60,290 L0,320 Z M40,200 L180,170 L150,280 L60,290 Z M180,170 L320,190 L280,300 L150,280 Z M320,190 L400,120 L400,310 L280,300 Z M0,320 L60,290 L100,400 L0,400 Z M60,290 L150,280 L180,380 L100,400 Z M150,280 L280,300 L260,400 L180,380 Z M280,300 L400,310 L400,400 L260,400 Z" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="2"/></svg>');
+            background-size: 350px 350px;
+            opacity: 0.3;
             z-index: 1;
-            pointer-events: none;
         }
         
         .hero-content { 
@@ -419,8 +409,7 @@
 
         /* RESPONSIVE */
         @media (max-width: 900px) {
-	            .hero { grid-template-columns: 1fr; }
-	            .hero::after { background-position: center; }
+            .hero { grid-template-columns: 1fr; background-position: center top; }
             .hero-content { text-align: center; padding: 40px 30px; align-items: center; }
             .hero-badge { margin: 0 auto 28px; }
             .hero-subtitle { margin: 0 auto 44px; }
@@ -444,7 +433,7 @@
             .nav-logo img { height: 60px; }
             .nav-links > a:not(.nav-lang a) { display: none; }
             .flota-grid, .why-grid { grid-template-columns: 1fr; }
-	            .hero::after { background-position: center; }
+            .hero { background-position: 65% center; background-size: cover; }
             .hero-title { font-size: 32px; }
             .hero-content { padding: 30px 20px; }
             .hero-form-container { padding: 10px 20px 50px; }
@@ -600,9 +589,12 @@
             }
         }
 
+    
+        /* HERO VEHICLE LAYER */
+        @media (max-width: 900px) { (max-width: 900px) {
+            }
 
-	        /* Asegura que el contenido del hero quede por encima de los overlays */
-	        .hero-content { position: relative; z-index: 3; }
+        .hero .container { position: relative; z-index: 2; }
 </style>
 </head>
 <body>
