@@ -93,7 +93,7 @@
 	            padding: 120px 60px 80px;
 	            background-image:
 	                linear-gradient(135deg, rgba(26,26,26,0.65) 0%, rgba(26,26,26,0.45) 100%),
-	                url('img/Luxury_Bakcground.png');
+	                url('img/Luxury_Background_Desktop.png');
 	            background-repeat: no-repeat;
 	            background-size: cover;
 	            background-position: right center;
@@ -449,11 +449,14 @@
             .nav-logo img { height: 60px; }
             .nav-links > a:not(.nav-lang a) { display: none; }
 		            .flota-grid, .why-grid { grid-template-columns: 1fr; }
-		            /* Mobile: evita repetición y acomoda el encuadre sin dejar "parches" */
+		            /* Mobile: usa imagen vertical optimizada para móviles */
 		            .hero {
+		                background-image:
+		                    linear-gradient(135deg, rgba(26,26,26,0.65) 0%, rgba(26,26,26,0.45) 100%),
+		                    url('img/Luxury_Background_Mobile.png');
 		                background-repeat: no-repeat;
 		                background-size: cover;
-		                background-position: 70% 50%;
+		                background-position: center center;
 		                background-color: #0b0f14;
 		            }
 		            /* Baja un poco la intensidad del patrón para que no se vea como cuadro gris */
