@@ -455,7 +455,7 @@
 		                    linear-gradient(135deg, rgba(26,26,26,0.65) 0%, rgba(26,26,26,0.45) 100%),
 		                    url('img/Luxury_Background_Mobile.png');
 		                background-repeat: no-repeat;
-		                background-size: cover;
+		                background-size: auto 95%;
 		                background-position: center center;
 		                background-color: #0b0f14;
 		            }
@@ -467,7 +467,22 @@
             .section-title { font-size: 28px; }
             .footer-grid { grid-template-columns: 1fr; text-align: center; }
             .footer-logo { text-align: center; }
-            .hero-features { flex-direction: column; gap: 20px; align-items: center; }
+            .hero-features {
+                flex-direction: column;
+                gap: 20px;
+                align-items: flex-start;
+                width: 100%;
+            }
+            .hero-feature {
+                display: flex;
+                align-items: flex-start;
+                gap: 14px;
+                width: 100%;
+            }
+            .hero-feature-icon {
+                flex-shrink: 0;
+                margin-top: 2px;
+            }
             .hero-stats { flex-direction: column; gap: 20px; align-items: center; }
             .track-search { flex-direction: column; }
             .booking-header { flex-direction: column; gap: 16px; align-items: center; text-align: center; }
