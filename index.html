@@ -449,11 +449,11 @@
             .nav-logo img { height: 60px; }
             .nav-links > a:not(.nav-lang a) { display: none; }
 		            .flota-grid, .why-grid { grid-template-columns: 1fr; }
-		            /* Mobile: evita repetición y acomoda el encuadre sin dejar "parches" */
+		            /* Mobile: muestra la imagen completa sin recortes */
 		            .hero {
 		                background-repeat: no-repeat;
-		                background-size: cover;
-		                background-position: 70% 50%;
+		                background-size: contain;
+		                background-position: center bottom;
 		                background-color: #0b0f14;
 		            }
 		            /* Baja un poco la intensidad del patrón para que no se vea como cuadro gris */
@@ -471,14 +471,6 @@
             .booking-actions { flex-direction: column; }
             .timeline-step { flex: 0 0 100%; }
             section { padding: 50px 20px; }
-        }
-
-        /* Dispositivos móviles pequeños (iPhone SE, etc.) - Ajusta posición de imagen hero */
-        @media (max-width: 480px) {
-            .hero {
-                background-position: center center;
-                background-size: cover;
-            }
         }
 
         /* Cotizador: en pantallas pequeñas, evita que FECHA/HORA se salgan del contenedor */
