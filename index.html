@@ -473,6 +473,14 @@
             section { padding: 50px 20px; }
         }
 
+        /* Dispositivos móviles pequeños (iPhone SE, etc.) - Ajusta posición de imagen hero */
+        @media (max-width: 480px) {
+            .hero {
+                background-position: center center;
+                background-size: cover;
+            }
+        }
+
         /* Cotizador: en pantallas pequeñas, evita que FECHA/HORA se salgan del contenedor */
         @media (max-width: 520px) {
             .form-row { grid-template-columns: 1fr; }
