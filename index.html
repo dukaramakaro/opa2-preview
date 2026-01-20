@@ -2005,6 +2005,18 @@
                     option.textContent = destinos[key].nombre;
                     destinoSelect.appendChild(option);
                 }
+                
+                // Agregar opción "Otro destino" al final
+                var otroOption = document.createElement('option');
+                otroOption.value = 'OTRO_DESTINO';
+                otroOption.textContent = currentLang === 'en' ? '🚖 Other destination (Quote via WhatsApp)' : '🚖 Otro destino (Cotizar por WhatsApp)';
+                otroOption.setAttribute('data-es', '🚖 Otro destino (Cotizar por WhatsApp)');
+                otroOption.setAttribute('data-en', '🚖 Other destination (Quote via WhatsApp)');
+                otroOption.style.fontWeight = '500';
+                otroOption.style.color = '#25D366';
+                destinoSelect.appendChild(otroOption);
+            }
+        }
 
         // Manejador para opción "Otro destino" en AMBOS desplegables
         function setupOtroDestinoHandler() {
@@ -2057,21 +2069,6 @@
         } else {
             setupOtroDestinoHandler();
         }
-                
-                        var whatsappLink = 'https://wa.me/529841951698?text=' + encodeURIComponent(mensaje);
-                        window.open(whatsappLink, '_blank');
-                        
-                        // Resetear el select
-                        setTimeout(function() {
-                            regionalDestSelect.value = '';
-                        }, 500);
-                    }
-                });
-            }
-        });
-        }
-
-        // Calcular precio real del tabulador
         function calcularPrecioReal(origen, destino, pasajeros, isLuxury) {
             if (!origen || !destino || !PRECIOS[origen] || !PRECIOS[origen][destino]) {
                 return null;
