@@ -2819,7 +2819,7 @@
 
         async function loadGoogleReviews() {
             try {
-                // Primero buscar el Place ID usando Text Search
+                // Buscar el negocio usando Text Search (incluye rating y reviews)
                 const searchUrl = `https://places.googleapis.com/v1/places:searchText`;
 
                 const searchResponse = await fetch(searchUrl, {
@@ -2827,7 +2827,7 @@
                     headers: {
                         'Content-Type': 'application/json',
                         'X-Goog-Api-Key': GOOGLE_API_KEY,
-                        'X-Goog-FieldMask': 'places.id,places.displayName,places.rating,places.userRatingCount,places.reviews'
+                        'X-Goog-FieldMask': 'places.id,places.displayName,places.rating,places.userRatingCount'
                     },
                     body: JSON.stringify({
                         textQuery: BUSINESS_NAME,
@@ -2853,29 +2853,9 @@
                 }
 
                 const place = searchData.places[0];
-                const placeId = place.id;
 
-                // Ahora obtener detalles completos incluyendo reviews
-                const detailsUrl = `https://places.googleapis.com/v1/${placeId}`;
-
-                const detailsResponse = await fetch(detailsUrl, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-Goog-Api-Key': GOOGLE_API_KEY,
-                        'X-Goog-FieldMask': 'rating,userRatingCount,reviews'
-                    }
-                });
-
-                if (!detailsResponse.ok) {
-                    console.error('Error fetching details:', await detailsResponse.text());
-                    return;
-                }
-
-                const details = await detailsResponse.json();
-
-                // Actualizar la UI con los datos reales
-                updateReviewsUI(details);
+                // Actualizar la UI con los datos del negocio
+                updateReviewsUI(place);
 
             } catch (error) {
                 console.error('Error loading Google reviews:', error);
