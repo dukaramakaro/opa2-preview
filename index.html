@@ -1961,25 +1961,6 @@
         function updateDestinations() {
             var origen = document.getElementById('airport-origin').value;
             var destinoSelect = document.getElementById('airport-destination');
-            
-            // Limpiar opciones
-            destinoSelect.innerHTML = '<option value="">Selecciona destino</option>';
-            
-            if (origen && PRECIOS[origen]) {
-                var destinos = PRECIOS[origen];
-                for (var key in destinos) {
-                    var option = document.createElement('option');
-                    option.value = key;
-                    option.textContent = destinos[key].nombre;
-                    destinoSelect.appendChild(option);
-                }
-            }
-        }
-
-        // Actualizar destinos para Private Transfer
-        function updateRegionalDestinations() {
-            var origen = document.getElementById('regional-origin').value;
-            var destinoSelect = document.getElementById('regional-destination');
             var currentLang = document.documentElement.lang || 'es';
             
             // Limpiar opciones
@@ -2005,20 +1986,78 @@
                 otroOption.style.color = '#25D366';
                 destinoSelect.appendChild(otroOption);
             }
-
-        // Manejador para opción "Otro destino" en desplegables
-        document.addEventListener('DOMContentLoaded', function() {
-            var regionalDestSelect = document.getElementById('regional-destination');
+        }
+        // Actualizar destinos para Private Transfer
+        function updateRegionalDestinations() {
+            var origen = document.getElementById('regional-origin').value;
+            var destinoSelect = document.getElementById('regional-destination');
+            var currentLang = document.documentElement.lang || 'es';
             
-            if (regionalDestSelect) {
-                regionalDestSelect.addEventListener('change', function() {
+            // Limpiar opciones
+            var placeholderText = currentLang === 'en' ? 'Select destination' : 'Selecciona destino';
+            destinoSelect.innerHTML = '<option value="">' + placeholderText + '</option>';
+            
+            if (origen && PRECIOS[origen]) {
+                var destinos = PRECIOS[origen];
+                for (var key in destinos) {
+                    var option = document.createElement('option');
+                    option.value = key;
+                    option.textContent = destinos[key].nombre;
+                    destinoSelect.appendChild(option);
+                }
+
+        // Manejador para opción "Otro destino" en AMBOS desplegables
+        function setupOtroDestinoHandler() {
+            // Manejador para Airport Transfer
+            var airportDestSelect = document.getElementById('airport-destination');
+            if (airportDestSelect) {
+                airportDestSelect.addEventListener('change', function() {
                     if (this.value === 'OTRO_DESTINO') {
-                        var origen = document.getElementById('regional-origin').value;
-                        var origenText = document.getElementById('regional-origin').options[document.getElementById('regional-origin').selectedIndex].text;
+                        var origenSelect = document.getElementById('airport-origin');
+                        var origenText = origenSelect.options[origenSelect.selectedIndex].text;
                         var currentLang = document.documentElement.lang || 'es';
                         var mensaje = currentLang === 'en' 
                             ? 'Hello! I need a quote for a transfer from ' + origenText + ' to another destination. Could you help me?'
                             : 'Hola! Necesito cotizar un traslado desde ' + origenText + ' hacia otro destino. ¿Podrían ayudarme?';
+                        var whatsappLink = 'https://wa.me/529841951698?text=' + encodeURIComponent(mensaje);
+                        window.open(whatsappLink, '_blank');
+                        
+                        // Resetear el select después de un momento
+                        var self = this;
+                        setTimeout(function() { self.value = ''; }, 500);
+                    }
+                });
+            }
+            
+            // Manejador para Private Transfer
+            var regionalDestSelect = document.getElementById('regional-destination');
+            if (regionalDestSelect) {
+                regionalDestSelect.addEventListener('change', function() {
+                    if (this.value === 'OTRO_DESTINO') {
+                        var origenSelect = document.getElementById('regional-origin');
+                        var origenText = origenSelect.options[origenSelect.selectedIndex].text;
+                        var currentLang = document.documentElement.lang || 'es';
+                        var mensaje = currentLang === 'en' 
+                            ? 'Hello! I need a quote for a transfer from ' + origenText + ' to another destination. Could you help me?'
+                            : 'Hola! Necesito cotizar un traslado desde ' + origenText + ' hacia otro destino. ¿Podrían ayudarme?';
+                        var whatsappLink = 'https://wa.me/529841951698?text=' + encodeURIComponent(mensaje);
+                        window.open(whatsappLink, '_blank');
+                        
+                        // Resetear el select después de un momento
+                        var self = this;
+                        setTimeout(function() { self.value = ''; }, 500);
+                    }
+                });
+            }
+        }
+        
+        // Ejecutar cuando el DOM esté listo
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', setupOtroDestinoHandler);
+        } else {
+            setupOtroDestinoHandler();
+        }
+                
                         var whatsappLink = 'https://wa.me/529841951698?text=' + encodeURIComponent(mensaje);
                         window.open(whatsappLink, '_blank');
                         
