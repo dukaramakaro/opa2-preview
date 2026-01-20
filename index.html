@@ -2806,4 +2806,136 @@
         }, { passive: false });
 
         // Prevenir gesture events en iOS
+        document.addEventListener('gesturestart', function(e) {
+            e.preventDefault();
+        });
+    </script>
+
+    <script>
+        // ======= GOOGLE PLACES API - REVIEWS DINÁMICOS =======
+        const GOOGLE_API_KEY = 'AIzaSyC0_tb-7BlZyt6OTS9u4h5Vk-xxyuBxpnE';
+        const BUSINESS_NAME = 'Opa2 Soluciones Integrales';
+        const BUSINESS_LOCATION = { lat: 20.6237528, lng: -87.0880082 };
+
+        async function loadGoogleReviews() {
+            try {
+                // Primero buscar el Place ID usando Text Search
+                const searchUrl = `https://places.googleapis.com/v1/places:searchText`;
+
+                const searchResponse = await fetch(searchUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Goog-Api-Key': GOOGLE_API_KEY,
+                        'X-Goog-FieldMask': 'places.id,places.displayName,places.rating,places.userRatingCount,places.reviews'
+                    },
+                    body: JSON.stringify({
+                        textQuery: BUSINESS_NAME,
+                        locationBias: {
+                            circle: {
+                                center: BUSINESS_LOCATION,
+                                radius: 500.0
+                            }
+                        }
+                    })
+                });
+
+                if (!searchResponse.ok) {
+                    console.error('Error fetching place:', await searchResponse.text());
+                    return;
+                }
+
+                const searchData = await searchResponse.json();
+
+                if (!searchData.places || searchData.places.length === 0) {
+                    console.error('No se encontró el negocio');
+                    return;
+                }
+
+                const place = searchData.places[0];
+                const placeId = place.id;
+
+                // Ahora obtener detalles completos incluyendo reviews
+                const detailsUrl = `https://places.googleapis.com/v1/${placeId}`;
+
+                const detailsResponse = await fetch(detailsUrl, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Goog-Api-Key': GOOGLE_API_KEY,
+                        'X-Goog-FieldMask': 'rating,userRatingCount,reviews'
+                    }
+                });
+
+                if (!detailsResponse.ok) {
+                    console.error('Error fetching details:', await detailsResponse.text());
+                    return;
+                }
+
+                const details = await detailsResponse.json();
+
+                // Actualizar la UI con los datos reales
+                updateReviewsUI(details);
+
+            } catch (error) {
+                console.error('Error loading Google reviews:', error);
+            }
+        }
+
+        function updateReviewsUI(placeDetails) {
+            const rating = placeDetails.rating || 5.0;
+            const reviewCount = placeDetails.userRatingCount || 12;
+
+            // Actualizar el rating
+            const ratingScoreEl = document.querySelector('.google-rating-score');
+            if (ratingScoreEl) {
+                ratingScoreEl.textContent = rating.toFixed(1);
+            }
+
+            // Actualizar las estrellas
+            const starsEl = document.querySelector('.google-rating-stars');
+            if (starsEl) {
+                const fullStars = Math.floor(rating);
+                const hasHalfStar = (rating % 1) >= 0.5;
+                let starsHTML = '★'.repeat(fullStars);
+                if (hasHalfStar && fullStars < 5) starsHTML += '☆';
+                starsHTML += '☆'.repeat(5 - Math.ceil(rating));
+                starsEl.textContent = starsHTML.substring(0, 5);
+            }
+
+            // Actualizar el contador de reviews
+            const countEl = document.querySelector('.google-reviews-count strong');
+            if (countEl) {
+                const currentLang = document.documentElement.lang || 'es';
+                const text = currentLang === 'en' ? `${reviewCount} reviews` : `${reviewCount} reseñas`;
+                countEl.setAttribute('data-es', `${reviewCount} reseñas`);
+                countEl.setAttribute('data-en', `${reviewCount} reviews`);
+                countEl.textContent = text;
+            }
+
+            // Actualizar subtítulo si el rating es perfecto
+            const subtitleEl = document.querySelector('.section-subtitle');
+            if (subtitleEl && rating === 5.0) {
+                const currentLang = document.documentElement.lang || 'es';
+                const text = currentLang === 'en' ? 'Perfect rating on Google Reviews' : 'Calificación perfecta en Google Reviews';
+                subtitleEl.textContent = text;
+            } else if (subtitleEl) {
+                const currentLang = document.documentElement.lang || 'es';
+                const text = currentLang === 'en' ? `${rating.toFixed(1)}/5 rating on Google Reviews` : `Calificación ${rating.toFixed(1)}/5 en Google Reviews`;
+                subtitleEl.textContent = text;
+            }
+
+            console.log('✅ Google Reviews actualizados:', { rating, reviewCount });
+        }
+
+        // Cargar reviews cuando la página esté lista
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', loadGoogleReviews);
+        } else {
+            loadGoogleReviews();
+        }
+    </script>
+
+</body>
+</html>
   
