@@ -2379,18 +2379,7 @@
                     return;
                 }
                 
-                // VALIDACIÓN 2: Si es hoy, validar que la hora no sea pasada
-                if (fechaIda.getTime() === hoy.getTime() && timeInput && timeInput.value) {
-                    var horaIda = timeInput.value.split(':');
-                    var ahora = new Date();
-                    var horaIdaDate = new Date();
-                    horaIdaDate.setHours(parseInt(horaIda[0]), parseInt(horaIda[1]), 0, 0);
-                    
-                    if (horaIdaDate < ahora) {
-                        alert(currentLang === 'es' ? 'La hora de salida no puede ser en el pasado' : 'Departure time cannot be in the past');
-                        return;
-                    }
-                }
+                // VALIDACIÓN 2: Si es hoy, permitir reservas del mismo día (el equipo confirma disponibilidad)
             }
             
             // VALIDACIÓN 3: Fecha de retorno no puede ser antes que fecha de ida

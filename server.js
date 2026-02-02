@@ -6,6 +6,7 @@ const https = require('https');
 const app = express();
 
 const CLIP_API_KEY = process.env.CLIP_API_KEY || '';
+const CLIP_SECRET_KEY = process.env.CLIP_SECRET_KEY || '';
 
 app.use(express.json());
 app.use(express.static('.'));
@@ -59,9 +60,12 @@ app.post('/crear-pago', async (req, res) => {
     try {
         const { precio, descripcion, codigo, email } = req.body;
 
-        if (!CLIP_API_KEY) {
-            return res.status(500).json({ error: 'CLIP_API_KEY no configurada' });
+        if (!CLIP_API_KEY || !CLIP_SECRET_KEY) {
+            return res.status(500).json({ error: 'Credenciales de Clip no configuradas' });
         }
+
+        // Generar token de autenticación: base64(api_key:secret_key)
+        const authToken = Buffer.from(CLIP_API_KEY + ':' + CLIP_SECRET_KEY).toString('base64');
 
         const origin = req.headers.origin || req.headers.referer || 'https://opa2.mx';
 
@@ -88,7 +92,7 @@ app.post('/crear-pago', async (req, res) => {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Basic ${CLIP_API_KEY}`,
+                'Authorization': `Basic ${authToken}`,
                 'Content-Length': Buffer.byteLength(clipData)
             }
         };
