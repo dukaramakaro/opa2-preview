@@ -60,12 +60,9 @@ app.post('/crear-pago', async (req, res) => {
     try {
         const { precio, descripcion, codigo, email } = req.body;
 
-        if (!CLIP_API_KEY || !CLIP_SECRET_KEY) {
-            return res.status(500).json({ error: 'Credenciales de Clip no configuradas' });
+        if (!CLIP_API_KEY) {
+            return res.status(500).json({ error: 'CLIP_API_KEY no configurada' });
         }
-
-        // Generar token de autenticación: base64(api_key:secret_key)
-        const authToken = Buffer.from(CLIP_API_KEY + ':' + CLIP_SECRET_KEY).toString('base64');
 
         const origin = req.headers.origin || req.headers.referer || 'https://opa2.mx';
 
@@ -86,40 +83,55 @@ app.post('/crear-pago', async (req, res) => {
             }
         });
 
-        const options = {
-            hostname: 'api-gw.payclip.com',
-            path: '/checkout',
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Basic ${authToken}`,
-                'Content-Length': Buffer.byteLength(clipData)
-            }
-        };
+        // Intentar autenticación con API key directa
+        const authMethods = [
+            `Basic ${CLIP_API_KEY}`,
+            `Basic ${Buffer.from(CLIP_API_KEY + ':' + CLIP_SECRET_KEY).toString('base64')}`,
+            `Bearer ${CLIP_API_KEY}`
+        ];
 
-        const clipResponse = await new Promise((resolve, reject) => {
-            const clipReq = https.request(options, (clipRes) => {
-                let data = '';
-                clipRes.on('data', (chunk) => { data += chunk; });
-                clipRes.on('end', () => {
-                    try {
-                        resolve({ status: clipRes.statusCode, body: JSON.parse(data) });
-                    } catch (e) {
-                        reject(new Error('Respuesta inválida de Clip: ' + data));
-                    }
+        let lastError = null;
+        for (const auth of authMethods) {
+            const options = {
+                hostname: 'api-gw.payclip.com',
+                path: '/checkout',
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': auth,
+                    'Content-Length': Buffer.byteLength(clipData)
+                }
+            };
+
+            const clipResponse = await new Promise((resolve, reject) => {
+                const clipReq = https.request(options, (clipRes) => {
+                    let data = '';
+                    clipRes.on('data', (chunk) => { data += chunk; });
+                    clipRes.on('end', () => {
+                        try {
+                            resolve({ status: clipRes.statusCode, body: JSON.parse(data) });
+                        } catch (e) {
+                            resolve({ status: clipRes.statusCode, body: { message: data } });
+                        }
+                    });
                 });
+                clipReq.on('error', reject);
+                clipReq.write(clipData);
+                clipReq.end();
             });
-            clipReq.on('error', reject);
-            clipReq.write(clipData);
-            clipReq.end();
-        });
 
-        if (clipResponse.status >= 200 && clipResponse.status < 300 && clipResponse.body.payment_request_url) {
-            res.json({ url: clipResponse.body.payment_request_url });
-        } else {
-            console.error('Error de Clip:', clipResponse.body);
-            res.status(500).json({ error: clipResponse.body.message || 'Error al crear pago en Clip' });
+            console.log(`Clip auth [${auth.substring(0, 15)}...] -> status: ${clipResponse.status}`);
+
+            if (clipResponse.status >= 200 && clipResponse.status < 300 && clipResponse.body.payment_request_url) {
+                return res.json({ url: clipResponse.body.payment_request_url });
+            }
+
+            lastError = clipResponse;
+            if (clipResponse.status !== 401 && clipResponse.status !== 403) break;
         }
+
+        console.error('Error de Clip (todos los métodos):', JSON.stringify(lastError));
+        res.status(500).json({ error: lastError?.body?.message || 'Error al crear pago en Clip' });
     } catch (error) {
         console.error('Error creando sesión de Clip:', error);
         res.status(500).json({ error: error.message });
