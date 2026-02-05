@@ -1,10 +1,12 @@
 const express = require('express');
-const Stripe = require('stripe');
 const path = require('path');
 const fs = require('fs');
+const https = require('https');
 
 const app = express();
-const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
+
+// Token de autenticación de Clip: base64(api_key:secret_key)
+const CLIP_AUTH_TOKEN = process.env.CLIP_AUTH_TOKEN || '';
 
 app.use(express.json());
 app.use(express.static('.'));
@@ -38,7 +40,7 @@ function guardarReserva(data) {
         data.estado || 'Pendiente',
         (data.notas || '').replace(/,/g, ';')
     ].map(field => `"${field}"`).join(',') + '\n';
-    
+
     fs.appendFileSync(CSV_FILE, row, 'utf8');
 }
 
@@ -53,36 +55,72 @@ app.post('/guardar-reserva', (req, res) => {
     }
 });
 
-// Crear sesión de pago
+// Crear sesión de pago con Clip Checkout Redireccionado
 app.post('/crear-pago', async (req, res) => {
     try {
         const { precio, descripcion, codigo, email } = req.body;
-        
-        const session = await stripe.checkout.sessions.create({
-            payment_method_types: ['card', 'oxxo'],
-            line_items: [{
-                price_data: {
-                    currency: 'mxn',
-                    product_data: {
-                        name: 'Traslado OPA2',
-                        description: descripcion
-                    },
-                    unit_amount: precio * 100 // Stripe usa centavos
-                },
-                quantity: 1
-            }],
-            mode: 'payment',
-            success_url: `${req.headers.origin}/confirmacion.html?codigo=${codigo}`,
-            cancel_url: `${req.headers.origin}`,
-            customer_email: email,
+
+        if (!CLIP_AUTH_TOKEN) {
+            return res.status(500).json({ error: 'CLIP_AUTH_TOKEN no configurado' });
+        }
+
+        const origin = req.headers.origin || req.headers.referer || 'https://opa2.mx';
+
+        const clipData = JSON.stringify({
+            amount: precio,
+            currency: 'MXN',
+            purchase_description: descripcion,
+            redirection_url: {
+                success: `${origin}/confirmacion.html?codigo=${codigo}`,
+                error: `${origin}`,
+                default: `${origin}`
+            },
             metadata: {
-                codigo: codigo
+                me_code: codigo,
+                customer_info: {
+                    email: email
+                }
             }
         });
-        
-        res.json({ url: session.url });
+
+        const options = {
+            hostname: 'api-gw.payclip.com',
+            path: '/checkout',
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Basic ${CLIP_AUTH_TOKEN}`,
+                'Content-Length': Buffer.byteLength(clipData)
+            }
+        };
+
+        const clipResponse = await new Promise((resolve, reject) => {
+            const clipReq = https.request(options, (clipRes) => {
+                let data = '';
+                clipRes.on('data', (chunk) => { data += chunk; });
+                clipRes.on('end', () => {
+                    try {
+                        resolve({ status: clipRes.statusCode, body: JSON.parse(data) });
+                    } catch (e) {
+                        resolve({ status: clipRes.statusCode, body: { message: data } });
+                    }
+                });
+            });
+            clipReq.on('error', reject);
+            clipReq.write(clipData);
+            clipReq.end();
+        });
+
+        console.log('Clip response status:', clipResponse.status);
+
+        if (clipResponse.status >= 200 && clipResponse.status < 300 && clipResponse.body.payment_request_url) {
+            res.json({ url: clipResponse.body.payment_request_url });
+        } else {
+            console.error('Error de Clip:', JSON.stringify(clipResponse.body));
+            res.status(500).json({ error: clipResponse.body.message || 'Error al crear pago en Clip' });
+        }
     } catch (error) {
-        console.error('Error creando sesión:', error);
+        console.error('Error creando sesión de Clip:', error);
         res.status(500).json({ error: error.message });
     }
 });
@@ -118,7 +156,7 @@ app.get('/admin/reservas', (req, res) => {
     if (!auth || Buffer.from(auth.split(' ')[1], 'base64').toString() !== ADMIN_PASSWORD) {
         return res.status(401).json({ error: 'No autorizado' });
     }
-    
+
     try {
         const csvData = fs.readFileSync(CSV_FILE, 'utf8');
         const lines = csvData.split('\n').filter(line => line.trim());
@@ -131,7 +169,7 @@ app.get('/admin/reservas', (req, res) => {
             });
             return obj;
         });
-        
+
         res.json({ reservas: reservas.reverse() }); // Más recientes primero
     } catch (error) {
         console.error('Error leyendo reservas:', error);
@@ -145,7 +183,7 @@ app.get('/admin/descargar', (req, res) => {
     if (!auth || Buffer.from(auth.split(' ')[1], 'base64').toString() !== ADMIN_PASSWORD) {
         return res.status(401).json({ error: 'No autorizado' });
     }
-    
+
     res.download(CSV_FILE, `reservas_opa2_${new Date().toISOString().split('T')[0]}.csv`);
 });
 
