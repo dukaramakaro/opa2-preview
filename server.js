@@ -193,14 +193,77 @@ app.get('/admin/reservas', (req, res) => {
     }
 });
 
-// Descargar CSV
+// Descargar CSV (acepta auth por header o query param)
 app.get('/admin/descargar', (req, res) => {
+    const auth = req.headers.authorization || req.query.authorization;
+    if (!auth) return res.status(401).json({ error: 'No autorizado' });
+    try {
+        const token = auth.replace('Bearer ', '');
+        if (Buffer.from(token, 'base64').toString() !== ADMIN_PASSWORD) {
+            return res.status(401).json({ error: 'No autorizado' });
+        }
+    } catch (e) {
+        return res.status(401).json({ error: 'No autorizado' });
+    }
+    res.download(CSV_FILE, `reservas_opa2_${new Date().toISOString().split('T')[0]}.csv`);
+});
+
+// Helper: actualizar estado de una reserva en el CSV
+function actualizarEstadoCSV(codigo, nuevoEstado) {
+    const csvData = fs.readFileSync(CSV_FILE, 'utf8');
+    const lines = csvData.split('\n');
+    let found = false;
+
+    const updated = lines.map((line, i) => {
+        if (i === 0 || !line.trim()) return line; // header o vacía
+        if (line.includes(`"${codigo}"`)) {
+            found = true;
+            // Reemplazar el campo Estado (penúltimo campo antes de Notas)
+            const values = line.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || [];
+            if (values.length >= 14) {
+                values[13] = `"${nuevoEstado}"`;
+            }
+            return values.join(',');
+        }
+        return line;
+    });
+
+    if (found) {
+        fs.writeFileSync(CSV_FILE, updated.join('\n'), 'utf8');
+    }
+    return found;
+}
+
+// Confirmar pago desde página de confirmación (Clip redirige aquí)
+app.post('/confirmar-pago', (req, res) => {
+    const { codigo } = req.body;
+    if (!codigo) return res.status(400).json({ error: 'Código requerido' });
+
+    try {
+        const found = actualizarEstadoCSV(codigo, 'Pagado');
+        res.json({ success: true, updated: found });
+    } catch (error) {
+        console.error('Error confirmando pago:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Admin - actualizar estado manualmente
+app.post('/admin/actualizar-estado', (req, res) => {
     const auth = req.headers.authorization;
     if (!auth || Buffer.from(auth.split(' ')[1], 'base64').toString() !== ADMIN_PASSWORD) {
         return res.status(401).json({ error: 'No autorizado' });
     }
 
-    res.download(CSV_FILE, `reservas_opa2_${new Date().toISOString().split('T')[0]}.csv`);
+    const { codigo, estado } = req.body;
+    if (!codigo || !estado) return res.status(400).json({ error: 'Código y estado requeridos' });
+
+    try {
+        const found = actualizarEstadoCSV(codigo, estado);
+        res.json({ success: true, updated: found });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
 });
 
 const PORT = process.env.PORT || 3000;
