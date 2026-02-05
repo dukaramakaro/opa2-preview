@@ -1,54 +1,62 @@
 require('dotenv').config();
 const express = require('express');
 const path = require('path');
-const fs = require('fs');
 const https = require('https');
+const { createClient } = require('@supabase/supabase-js');
 
 const app = express();
 
 const CLIP_API_KEY = process.env.CLIP_API_KEY || '';
 const CLIP_SECRET_KEY = process.env.CLIP_SECRET_KEY || '';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'playa2026*';
+
+// Supabase
+const supabase = createClient(
+    process.env.SUPABASE_URL || '',
+    process.env.SUPABASE_ANON_KEY || ''
+);
 
 app.use(express.json());
 app.use(express.static('.'));
 
-// Archivo CSV para reservas
-const CSV_FILE = 'reservas.csv';
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'playa2026*';
-
-// Inicializar CSV si no existe
-if (!fs.existsSync(CSV_FILE)) {
-    const headers = 'Fecha,Codigo,Nombre,Email,Telefono,Vuelo,Servicio,Origen,Destino,FechaViaje,Pasajeros,Vehiculo,Total,Estado,Notas\n';
-    fs.writeFileSync(CSV_FILE, headers, 'utf8');
-}
-
-// Guardar reserva en CSV
-function guardarReserva(data) {
-    const row = [
-        new Date().toISOString(),
-        data.codigo || '',
-        data.nombre || '',
-        data.email || '',
-        data.telefono || '',
-        data.vuelo || '',
-        data.servicio || '',
-        data.origen || '',
-        data.destino || '',
-        data.fecha || '',
-        data.pasajeros || '',
-        data.vehiculo || '',
-        data.total || '',
-        data.estado || 'Pendiente',
-        (data.notas || '').replace(/,/g, ';')
-    ].map(field => `"${field}"`).join(',') + '\n';
-
-    fs.appendFileSync(CSV_FILE, row, 'utf8');
+// Helper: validar auth del admin
+function validarAdmin(req) {
+    const auth = req.headers.authorization;
+    if (!auth) return false;
+    try {
+        const token = auth.split(' ')[1];
+        return Buffer.from(token, 'base64').toString() === ADMIN_PASSWORD;
+    } catch (e) {
+        return false;
+    }
 }
 
 // Endpoint para guardar reserva
-app.post('/guardar-reserva', (req, res) => {
+app.post('/guardar-reserva', async (req, res) => {
     try {
-        guardarReserva(req.body);
+        const data = req.body;
+        const { error } = await supabase.from('reservas').insert({
+            codigo: data.codigo || null,
+            nombre: data.nombre || '',
+            email: data.email || '',
+            telefono: data.telefono || '',
+            vuelo: data.vuelo || '',
+            servicio: data.servicio || '',
+            origen: data.origen || '',
+            destino: data.destino || '',
+            fecha_viaje: data.fecha || '',
+            pasajeros: data.pasajeros || '',
+            vehiculo: data.vehiculo || '',
+            total: data.total || '',
+            estado: data.estado || 'Pendiente',
+            notas: data.notas || '',
+            idioma: data.idioma || 'es'
+        });
+
+        if (error) {
+            console.error('Error Supabase insert:', error);
+            return res.status(500).json({ error: error.message });
+        }
         res.json({ success: true });
     } catch (error) {
         console.error('Error guardando reserva:', error);
@@ -154,9 +162,7 @@ app.post('/admin/login', (req, res) => {
 // Panel admin - validar token
 app.post('/admin/validate', (req, res) => {
     const auth = req.headers.authorization;
-    if (!auth) {
-        return res.json({ valid: false });
-    }
+    if (!auth) return res.json({ valid: false });
     try {
         const token = auth.split(' ')[1];
         const password = Buffer.from(token, 'base64').toString();
@@ -167,35 +173,45 @@ app.post('/admin/validate', (req, res) => {
 });
 
 // Panel admin - ver reservas
-app.get('/admin/reservas', (req, res) => {
-    const auth = req.headers.authorization;
-    if (!auth || Buffer.from(auth.split(' ')[1], 'base64').toString() !== ADMIN_PASSWORD) {
-        return res.status(401).json({ error: 'No autorizado' });
-    }
+app.get('/admin/reservas', async (req, res) => {
+    if (!validarAdmin(req)) return res.status(401).json({ error: 'No autorizado' });
 
     try {
-        const csvData = fs.readFileSync(CSV_FILE, 'utf8');
-        const lines = csvData.split('\n').filter(line => line.trim());
-        const headers = lines[0].split(',');
-        const reservas = lines.slice(1).map(line => {
-            const values = line.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || [];
-            const obj = {};
-            headers.forEach((header, i) => {
-                obj[header.replace(/"/g, '')] = (values[i] || '').replace(/"/g, '');
-            });
-            return obj;
-        });
+        const { data, error } = await supabase
+            .from('reservas')
+            .select('*')
+            .order('created_at', { ascending: false });
 
-        res.json({ reservas: reservas.reverse() }); // Más recientes primero
+        if (error) return res.status(500).json({ error: error.message });
+
+        const reservas = (data || []).map(r => ({
+            Fecha: r.created_at,
+            Codigo: r.codigo,
+            Nombre: r.nombre,
+            Email: r.email,
+            Telefono: r.telefono,
+            Vuelo: r.vuelo,
+            Servicio: r.servicio,
+            Origen: r.origen,
+            Destino: r.destino,
+            FechaViaje: r.fecha_viaje,
+            Pasajeros: r.pasajeros,
+            Vehiculo: r.vehiculo,
+            Total: r.total,
+            Estado: r.estado,
+            Notas: r.notas
+        }));
+
+        res.json({ reservas });
     } catch (error) {
         console.error('Error leyendo reservas:', error);
         res.status(500).json({ error: error.message });
     }
 });
 
-// Descargar CSV (acepta auth por header o query param)
-app.get('/admin/descargar', (req, res) => {
-    const auth = req.headers.authorization || req.query.authorization;
+// Descargar CSV (genera CSV desde Supabase)
+app.get('/admin/descargar', async (req, res) => {
+    const auth = req.headers.authorization;
     if (!auth) return res.status(401).json({ error: 'No autorizado' });
     try {
         const token = auth.replace('Bearer ', '');
@@ -205,43 +221,40 @@ app.get('/admin/descargar', (req, res) => {
     } catch (e) {
         return res.status(401).json({ error: 'No autorizado' });
     }
-    res.download(CSV_FILE, `reservas_opa2_${new Date().toISOString().split('T')[0]}.csv`);
+
+    const { data, error } = await supabase
+        .from('reservas')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+    if (error) return res.status(500).json({ error: error.message });
+
+    const headers = 'Fecha,Codigo,Nombre,Email,Telefono,Vuelo,Servicio,Origen,Destino,FechaViaje,Pasajeros,Vehiculo,Total,Estado,Notas';
+    const rows = (data || []).map(r => [
+        r.created_at, r.codigo, r.nombre, r.email, r.telefono, r.vuelo,
+        r.servicio, r.origen, r.destino, r.fecha_viaje, r.pasajeros,
+        r.vehiculo, r.total, r.estado, r.notas
+    ].map(f => `"${(f || '').toString().replace(/"/g, '""')}"`).join(','));
+
+    const csv = [headers, ...rows].join('\n');
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition', `attachment; filename=reservas_opa2_${new Date().toISOString().split('T')[0]}.csv`);
+    res.send(csv);
 });
 
-// Helper: actualizar estado de una reserva en el CSV
-function actualizarEstadoCSV(codigo, nuevoEstado) {
-    const csvData = fs.readFileSync(CSV_FILE, 'utf8');
-    const lines = csvData.split('\n');
-    let found = false;
-
-    const updated = lines.map((line, i) => {
-        if (i === 0 || !line.trim()) return line; // header o vacía
-        if (line.includes(`"${codigo}"`)) {
-            found = true;
-            // Reemplazar el campo Estado (penúltimo campo antes de Notas)
-            const values = line.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || [];
-            if (values.length >= 14) {
-                values[13] = `"${nuevoEstado}"`;
-            }
-            return values.join(',');
-        }
-        return line;
-    });
-
-    if (found) {
-        fs.writeFileSync(CSV_FILE, updated.join('\n'), 'utf8');
-    }
-    return found;
-}
-
 // Confirmar pago desde página de confirmación (Clip redirige aquí)
-app.post('/confirmar-pago', (req, res) => {
+app.post('/confirmar-pago', async (req, res) => {
     const { codigo } = req.body;
     if (!codigo) return res.status(400).json({ error: 'Código requerido' });
 
     try {
-        const found = actualizarEstadoCSV(codigo, 'Pagado');
-        res.json({ success: true, updated: found });
+        const { error } = await supabase
+            .from('reservas')
+            .update({ estado: 'Pagado' })
+            .eq('codigo', codigo);
+
+        if (error) return res.status(500).json({ error: error.message });
+        res.json({ success: true });
     } catch (error) {
         console.error('Error confirmando pago:', error);
         res.status(500).json({ error: error.message });
@@ -249,18 +262,52 @@ app.post('/confirmar-pago', (req, res) => {
 });
 
 // Admin - actualizar estado manualmente
-app.post('/admin/actualizar-estado', (req, res) => {
-    const auth = req.headers.authorization;
-    if (!auth || Buffer.from(auth.split(' ')[1], 'base64').toString() !== ADMIN_PASSWORD) {
-        return res.status(401).json({ error: 'No autorizado' });
-    }
+app.post('/admin/actualizar-estado', async (req, res) => {
+    if (!validarAdmin(req)) return res.status(401).json({ error: 'No autorizado' });
 
     const { codigo, estado } = req.body;
     if (!codigo || !estado) return res.status(400).json({ error: 'Código y estado requeridos' });
 
     try {
-        const found = actualizarEstadoCSV(codigo, estado);
-        res.json({ success: true, updated: found });
+        const { error } = await supabase
+            .from('reservas')
+            .update({ estado })
+            .eq('codigo', codigo);
+
+        if (error) return res.status(500).json({ error: error.message });
+        res.json({ success: true });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Admin - crear reserva manual
+app.post('/admin/nueva-reserva', async (req, res) => {
+    if (!validarAdmin(req)) return res.status(401).json({ error: 'No autorizado' });
+
+    const data = req.body;
+    const codigo = 'OPA2-' + new Date().getFullYear() + '-' + Math.floor(100000 + Math.random() * 900000);
+
+    try {
+        const { error } = await supabase.from('reservas').insert({
+            codigo: codigo,
+            nombre: data.nombre || '',
+            email: data.email || '',
+            telefono: data.telefono || '',
+            vuelo: data.vuelo || '',
+            servicio: data.servicio || '',
+            origen: data.origen || '',
+            destino: data.destino || '',
+            fecha_viaje: data.fecha_viaje || '',
+            pasajeros: data.pasajeros || '',
+            vehiculo: data.vehiculo || '',
+            total: data.total || '',
+            estado: data.estado || 'Pendiente',
+            notas: data.notas || ''
+        });
+
+        if (error) return res.status(500).json({ error: error.message });
+        res.json({ success: true, codigo: codigo });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }

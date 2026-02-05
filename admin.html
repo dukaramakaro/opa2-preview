@@ -105,6 +105,19 @@
             display: flex;
             gap: 10px;
         }
+        .btn-action {
+            padding: 12px 24px;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Sora', sans-serif;
+            transition: all 0.3s;
+        }
+        .btn-action:hover { transform: translateY(-2px); }
+        .btn-new { background: #E63946; }
+        .btn-new:hover { background: #c62f3b; }
         .btn-download {
             padding: 12px 24px;
             background: #00a699;
@@ -246,6 +259,60 @@
             margin-bottom: 16px;
             stroke: #d0d0d0;
         }
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .modal-overlay.show { display: flex; }
+        .modal-box {
+            background: white;
+            border-radius: 20px;
+            padding: 32px;
+            width: 100%;
+            max-width: 550px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .modal-box h2 { font-size: 20px; margin-bottom: 20px; }
+        .modal-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        .modal-field { margin-bottom: 12px; }
+        .modal-field label { display: block; font-size: 12px; font-weight: 600; color: #6b6b6b; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .modal-field input, .modal-field select, .modal-field textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            font-family: 'Sora', sans-serif;
+            font-size: 14px;
+        }
+        .modal-field textarea { resize: vertical; min-height: 60px; }
+        .modal-field input:focus, .modal-field select:focus, .modal-field textarea:focus {
+            outline: none; border-color: #E63946;
+        }
+        .modal-buttons { display: flex; gap: 10px; margin-top: 20px; }
+        .modal-buttons button {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            font-family: 'Sora', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .modal-btn-save { background: #E63946; color: white; }
+        .modal-btn-cancel { background: #f0f0f0; color: #333; }
     </style>
 </head>
 <body>
@@ -267,6 +334,7 @@
         <div class="header">
             <h1>Reservas OPA2</h1>
             <div class="header-buttons">
+                <button class="btn-action btn-new" onclick="abrirNuevaReserva()">+ Nueva Reserva</button>
                 <button class="btn-download" onclick="descargarCSV()">Descargar CSV</button>
                 <button class="btn-logout" onclick="logout()">Salir</button>
             </div>
@@ -308,6 +376,85 @@
                 </thead>
                 <tbody id="reservas-body"></tbody>
             </table>
+        </div>
+    </div>
+
+    <!-- Modal Nueva Reserva -->
+    <div class="modal-overlay" id="modal-nueva">
+        <div class="modal-box">
+            <h2>Nueva Reserva Manual</h2>
+            <div class="modal-row">
+                <div class="modal-field">
+                    <label>Nombre</label>
+                    <input type="text" id="nr-nombre" placeholder="Nombre del cliente">
+                </div>
+                <div class="modal-field">
+                    <label>Email</label>
+                    <input type="email" id="nr-email" placeholder="email@ejemplo.com">
+                </div>
+            </div>
+            <div class="modal-row">
+                <div class="modal-field">
+                    <label>Telefono</label>
+                    <input type="text" id="nr-telefono" placeholder="+52 984...">
+                </div>
+                <div class="modal-field">
+                    <label>Vuelo</label>
+                    <input type="text" id="nr-vuelo" placeholder="AA1234 (opcional)">
+                </div>
+            </div>
+            <div class="modal-row">
+                <div class="modal-field">
+                    <label>Servicio</label>
+                    <input type="text" id="nr-servicio" placeholder="Airport Shuttle, Private...">
+                </div>
+                <div class="modal-field">
+                    <label>Pasajeros</label>
+                    <input type="text" id="nr-pasajeros" placeholder="2">
+                </div>
+            </div>
+            <div class="modal-row">
+                <div class="modal-field">
+                    <label>Origen</label>
+                    <input type="text" id="nr-origen" placeholder="Aeropuerto de Cancun (CUN)">
+                </div>
+                <div class="modal-field">
+                    <label>Destino</label>
+                    <input type="text" id="nr-destino" placeholder="Hotel Xcaret">
+                </div>
+            </div>
+            <div class="modal-row">
+                <div class="modal-field">
+                    <label>Fecha del viaje</label>
+                    <input type="text" id="nr-fecha" placeholder="15 Feb 2026, 14:00">
+                </div>
+                <div class="modal-field">
+                    <label>Total</label>
+                    <input type="text" id="nr-total" placeholder="$1,500 MXN">
+                </div>
+            </div>
+            <div class="modal-row">
+                <div class="modal-field">
+                    <label>Estado</label>
+                    <select id="nr-estado">
+                        <option value="Pagado">Pagado</option>
+                        <option value="Pendiente" selected>Pendiente</option>
+                        <option value="Pago en proceso">Pago en proceso</option>
+                    </select>
+                </div>
+                <div class="modal-field">
+                    <label>Vehiculo</label>
+                    <input type="text" id="nr-vehiculo" placeholder="Suburban, Sprinter...">
+                </div>
+            </div>
+            <div class="modal-field">
+                <label>Notas</label>
+                <textarea id="nr-notas" placeholder="Notas adicionales..."></textarea>
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-btn-cancel" onclick="cerrarModal()">Cancelar</button>
+                <button class="modal-btn-save" onclick="guardarNuevaReserva()">Guardar Reserva</button>
+            </div>
         </div>
     </div>
 
@@ -487,6 +634,65 @@
             })
             .catch(function(err) { alert('Error descargando: ' + err.message); });
         }
+
+        function abrirNuevaReserva() {
+            document.getElementById('modal-nueva').classList.add('show');
+        }
+
+        function cerrarModal() {
+            document.getElementById('modal-nueva').classList.remove('show');
+            // Limpiar campos
+            ['nr-nombre','nr-email','nr-telefono','nr-vuelo','nr-servicio','nr-pasajeros','nr-origen','nr-destino','nr-fecha','nr-total','nr-vehiculo','nr-notas'].forEach(function(id) {
+                document.getElementById(id).value = '';
+            });
+            document.getElementById('nr-estado').value = 'Pendiente';
+        }
+
+        function guardarNuevaReserva() {
+            var nombre = document.getElementById('nr-nombre').value.trim();
+            if (!nombre) { alert('El nombre es requerido'); return; }
+
+            var data = {
+                nombre: nombre,
+                email: document.getElementById('nr-email').value.trim(),
+                telefono: document.getElementById('nr-telefono').value.trim(),
+                vuelo: document.getElementById('nr-vuelo').value.trim(),
+                servicio: document.getElementById('nr-servicio').value.trim(),
+                pasajeros: document.getElementById('nr-pasajeros').value.trim(),
+                origen: document.getElementById('nr-origen').value.trim(),
+                destino: document.getElementById('nr-destino').value.trim(),
+                fecha_viaje: document.getElementById('nr-fecha').value.trim(),
+                total: document.getElementById('nr-total').value.trim(),
+                vehiculo: document.getElementById('nr-vehiculo').value.trim(),
+                estado: document.getElementById('nr-estado').value,
+                notas: document.getElementById('nr-notas').value.trim()
+            };
+
+            fetch('/admin/nueva-reserva', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + authToken
+                },
+                body: JSON.stringify(data)
+            })
+            .then(r => r.json())
+            .then(function(result) {
+                if (result.success) {
+                    cerrarModal();
+                    cargarReservas();
+                    alert('Reserva creada: ' + result.codigo);
+                } else {
+                    alert('Error: ' + (result.error || 'Error desconocido'));
+                }
+            })
+            .catch(function() { alert('Error de conexión'); });
+        }
+
+        // Cerrar modal al hacer clic fuera
+        document.getElementById('modal-nueva').addEventListener('click', function(e) {
+            if (e.target === this) cerrarModal();
+        });
 
         // Recargar cada 30 segundos
         setInterval(cargarReservas, 30000);
