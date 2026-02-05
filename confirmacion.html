@@ -152,6 +152,15 @@
         const codigo = urlParams.get('codigo');
         if (codigo) {
             document.getElementById('codigo').textContent = codigo;
+
+            // Marcar reserva como pagada en el servidor
+            fetch('/confirmar-pago', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ codigo: codigo })
+            }).then(function(r) { return r.json(); })
+              .then(function(data) { console.log('Pago confirmado:', data); })
+              .catch(function(err) { console.error('Error confirmando pago:', err); });
         }
     </script>
 </body>

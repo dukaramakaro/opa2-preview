@@ -7,9 +7,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-            font-family: 'Sora', sans-serif; 
-            background: #fafafa; 
+        body {
+            font-family: 'Sora', sans-serif;
+            background: #fafafa;
             min-height: 100vh;
         }
         .login-container {
@@ -101,6 +101,10 @@
             font-size: 24px;
             color: #1a1a1a;
         }
+        .header-buttons {
+            display: flex;
+            gap: 10px;
+        }
         .btn-download {
             padding: 12px 24px;
             background: #00a699;
@@ -125,11 +129,10 @@
             font-weight: 600;
             cursor: pointer;
             font-family: 'Sora', sans-serif;
-            margin-left: 10px;
         }
         .stats {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
             gap: 16px;
             margin-bottom: 20px;
         }
@@ -149,6 +152,8 @@
             font-weight: 700;
             color: #E63946;
         }
+        .stat-value.green { color: #22c55e; }
+        .stat-value.amber { color: #f59e0b; }
         .table-container {
             background: white;
             border-radius: 16px;
@@ -184,7 +189,11 @@
             border-radius: 20px;
             font-size: 12px;
             font-weight: 600;
+            cursor: pointer;
+            position: relative;
+            user-select: none;
         }
+        .badge:hover { opacity: 0.8; }
         .badge-pending {
             background: #fff3cd;
             color: #856404;
@@ -193,6 +202,39 @@
             background: #d4edda;
             color: #155724;
         }
+        .badge-cancelled {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .status-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            padding: 8px;
+            z-index: 100;
+            min-width: 160px;
+        }
+        .status-menu.show { display: block; }
+        .status-option {
+            display: block;
+            width: 100%;
+            padding: 10px 14px;
+            border: none;
+            background: none;
+            text-align: left;
+            font-family: 'Sora', sans-serif;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+        .status-option:hover { background: #f5f5f5; }
+        .status-cell { position: relative; }
         .empty-state {
             text-align: center;
             padding: 60px 20px;
@@ -214,7 +256,7 @@
             <p>Ingresa tu contraseña para acceder</p>
             <div class="form-group">
                 <label class="form-label">Contraseña</label>
-                <input type="password" class="form-input" id="password" placeholder="••••••••">
+                <input type="password" class="form-input" id="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')login()">
             </div>
             <button class="btn" onclick="login()">Ingresar</button>
         </div>
@@ -223,9 +265,9 @@
     <!-- Dashboard -->
     <div class="dashboard" id="dashboard-view">
         <div class="header">
-            <h1>📋 Reservas OPA2</h1>
-            <div>
-                <button class="btn-download" onclick="descargarCSV()">📥 Descargar CSV</button>
+            <h1>Reservas OPA2</h1>
+            <div class="header-buttons">
+                <button class="btn-download" onclick="descargarCSV()">Descargar CSV</button>
                 <button class="btn-logout" onclick="logout()">Salir</button>
             </div>
         </div>
@@ -236,12 +278,16 @@
                 <div class="stat-value" id="stat-total">0</div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">Hoy</div>
-                <div class="stat-value" id="stat-today">0</div>
+                <div class="stat-label">Pagadas</div>
+                <div class="stat-value green" id="stat-paid">0</div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">Esta Semana</div>
-                <div class="stat-value" id="stat-week">0</div>
+                <div class="stat-label">En Proceso</div>
+                <div class="stat-value amber" id="stat-pending">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Hoy</div>
+                <div class="stat-value" id="stat-today">0</div>
             </div>
         </div>
 
@@ -250,7 +296,7 @@
                 <thead>
                     <tr>
                         <th>Fecha</th>
-                        <th>Código</th>
+                        <th>Codigo</th>
                         <th>Cliente</th>
                         <th>Contacto</th>
                         <th>Servicio</th>
@@ -267,12 +313,11 @@
 
     <script>
         let authToken = localStorage.getItem('opa2_auth');
-        
+
         if (authToken) {
-            // Validar token con servidor
             fetch('/admin/validate', {
                 method: 'POST',
-                headers: { 
+                headers: {
                     'Content-Type': 'application/json',
                     'Authorization': 'Bearer ' + authToken
                 }
@@ -294,11 +339,11 @@
 
         function login() {
             const password = document.getElementById('password').value;
-            
+
             fetch('/admin/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ password })
+                body: JSON.stringify({ password: password })
             })
             .then(r => r.json())
             .then(data => {
@@ -310,15 +355,8 @@
                     alert('Contraseña incorrecta');
                 }
             })
-            .catch(error => {
-                // Fallback para pruebas locales sin servidor
-                if (password === 'playa2026*') {
-                    authToken = btoa(password);
-                    localStorage.setItem('opa2_auth', authToken);
-                    loadDashboard();
-                } else {
-                    alert('Contraseña incorrecta');
-                }
+            .catch(function() {
+                alert('Error de conexión');
             });
         }
 
@@ -333,6 +371,12 @@
             cargarReservas();
         }
 
+        function badgeClass(estado) {
+            if (estado === 'Pagado') return 'badge-paid';
+            if (estado === 'Cancelado') return 'badge-cancelled';
+            return 'badge-pending';
+        }
+
         function cargarReservas() {
             fetch('/admin/reservas', {
                 headers: { 'Authorization': 'Bearer ' + authToken }
@@ -340,45 +384,108 @@
             .then(r => r.json())
             .then(data => {
                 const reservas = data.reservas || [];
-                
+
                 // Stats
                 document.getElementById('stat-total').textContent = reservas.length;
-                
+                document.getElementById('stat-paid').textContent = reservas.filter(r => r.Estado === 'Pagado').length;
+                document.getElementById('stat-pending').textContent = reservas.filter(r => r.Estado !== 'Pagado' && r.Estado !== 'Cancelado').length;
+
                 const today = new Date().toISOString().split('T')[0];
-                const todayCount = reservas.filter(r => r.Fecha.startsWith(today)).length;
+                var todayCount = reservas.filter(function(r) { return r.Fecha && r.Fecha.startsWith(today); }).length;
                 document.getElementById('stat-today').textContent = todayCount;
-                
-                const weekAgo = new Date(Date.now() - 7*24*60*60*1000).toISOString();
-                const weekCount = reservas.filter(r => r.Fecha >= weekAgo).length;
-                document.getElementById('stat-week').textContent = weekCount;
-                
+
                 // Table
                 const tbody = document.getElementById('reservas-body');
                 if (reservas.length === 0) {
                     tbody.innerHTML = '<tr><td colspan="9" class="empty-state"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" /></svg><p>No hay reservas aún</p></td></tr>';
                     return;
                 }
-                
-                tbody.innerHTML = reservas.map(r => `
-                    <tr>
-                        <td>${new Date(r.Fecha).toLocaleDateString('es-MX', {day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit'})}</td>
-                        <td><strong>${r.Codigo}</strong></td>
-                        <td>${r.Nombre}</td>
-                        <td>${r.Email}<br><small style="color:#6b6b6b">${r.Telefono}</small></td>
-                        <td>${r.Servicio}</td>
-                        <td>${r.Origen} → ${r.Destino}</td>
-                        <td>${r.FechaViaje}<br><small style="color:#6b6b6b">${r.Pasajeros} pax</small></td>
-                        <td><strong>${r.Total}</strong></td>
-                        <td><span class="badge ${r.Estado === 'Pagado' ? 'badge-paid' : 'badge-pending'}">${r.Estado}</span></td>
-                    </tr>
-                `).join('');
+
+                tbody.innerHTML = reservas.map(function(r) {
+                    return '<tr>' +
+                        '<td>' + formatDate(r.Fecha) + '</td>' +
+                        '<td><strong>' + (r.Codigo || '') + '</strong></td>' +
+                        '<td>' + (r.Nombre || '') + '</td>' +
+                        '<td>' + (r.Email || '') + '<br><small style="color:#6b6b6b">' + (r.Telefono || '') + '</small></td>' +
+                        '<td>' + (r.Servicio || '') + '</td>' +
+                        '<td>' + (r.Origen || '') + ' &rarr; ' + (r.Destino || '') + '</td>' +
+                        '<td>' + (r.FechaViaje || '') + '<br><small style="color:#6b6b6b">' + (r.Pasajeros || '') + ' pax</small></td>' +
+                        '<td><strong>' + (r.Total || '') + '</strong></td>' +
+                        '<td class="status-cell">' +
+                            '<span class="badge ' + badgeClass(r.Estado) + '" onclick="toggleStatusMenu(this, \'' + (r.Codigo || '') + '\')">' + (r.Estado || 'Pendiente') + '</span>' +
+                            '<div class="status-menu" id="menu-' + (r.Codigo || '') + '">' +
+                                '<button class="status-option" onclick="cambiarEstado(\'' + (r.Codigo || '') + '\', \'Pagado\')">Pagado</button>' +
+                                '<button class="status-option" onclick="cambiarEstado(\'' + (r.Codigo || '') + '\', \'Pago en proceso\')">Pago en proceso</button>' +
+                                '<button class="status-option" onclick="cambiarEstado(\'' + (r.Codigo || '') + '\', \'Pendiente\')">Pendiente</button>' +
+                                '<button class="status-option" onclick="cambiarEstado(\'' + (r.Codigo || '') + '\', \'Cancelado\')">Cancelado</button>' +
+                            '</div>' +
+                        '</td>' +
+                    '</tr>';
+                }).join('');
             });
         }
 
+        function formatDate(fecha) {
+            try {
+                return new Date(fecha).toLocaleDateString('es-MX', {day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit'});
+            } catch(e) {
+                return fecha || '';
+            }
+        }
+
+        function toggleStatusMenu(badge, codigo) {
+            // Cerrar todos los menús abiertos
+            document.querySelectorAll('.status-menu.show').forEach(function(m) { m.classList.remove('show'); });
+            var menu = document.getElementById('menu-' + codigo);
+            if (menu) menu.classList.toggle('show');
+        }
+
+        // Cerrar menús al hacer clic fuera
+        document.addEventListener('click', function(e) {
+            if (!e.target.classList.contains('badge') && !e.target.classList.contains('status-option')) {
+                document.querySelectorAll('.status-menu.show').forEach(function(m) { m.classList.remove('show'); });
+            }
+        });
+
+        function cambiarEstado(codigo, nuevoEstado) {
+            fetch('/admin/actualizar-estado', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + authToken
+                },
+                body: JSON.stringify({ codigo: codigo, estado: nuevoEstado })
+            })
+            .then(r => r.json())
+            .then(function(data) {
+                if (data.success) {
+                    cargarReservas(); // Recargar tabla
+                } else {
+                    alert('Error al actualizar estado');
+                }
+            })
+            .catch(function() { alert('Error de conexión'); });
+        }
+
         function descargarCSV() {
-            window.location.href = '/admin/descargar?' + new URLSearchParams({
-                authorization: 'Bearer ' + authToken
-            });
+            fetch('/admin/descargar', {
+                headers: { 'Authorization': 'Bearer ' + authToken }
+            })
+            .then(function(response) {
+                if (!response.ok) throw new Error('No autorizado');
+                return response.blob();
+            })
+            .then(function(blob) {
+                var url = window.URL.createObjectURL(blob);
+                var a = document.createElement('a');
+                a.href = url;
+                a.download = 'reservas_opa2_' + new Date().toISOString().split('T')[0] + '.csv';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+            })
+            .catch(function(err) { alert('Error descargando: ' + err.message); });
         }
 
         // Recargar cada 30 segundos
