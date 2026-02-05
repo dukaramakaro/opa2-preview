@@ -88,8 +88,8 @@ app.post('/crear-pago', async (req, res) => {
         const authToken = Buffer.from(`${CLIP_API_KEY}:${CLIP_SECRET_KEY}`).toString('base64');
 
         const options = {
-            hostname: 'api-gw.payclip.com',
-            path: '/checkout',
+            hostname: 'api.payclip.com',
+            path: '/v2/checkout',
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
