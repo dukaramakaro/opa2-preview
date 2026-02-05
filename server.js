@@ -59,7 +59,8 @@ app.post('/guardar-reserva', (req, res) => {
 // Crear sesión de pago con Clip
 app.post('/crear-pago', async (req, res) => {
     try {
-        const { precio, descripcion, codigo, email } = req.body;
+        const { precio, moneda, descripcion, codigo, email } = req.body;
+        const currency = moneda === 'USD' ? 'USD' : 'MXN';
 
         if (!CLIP_API_KEY) {
             return res.status(500).json({ error: 'CLIP_API_KEY no configurada' });
@@ -67,9 +68,9 @@ app.post('/crear-pago', async (req, res) => {
 
         const origin = req.headers.origin || req.headers.referer || 'https://opa2.mx';
 
-        const clipData = JSON.stringify({
+        const clipPayload = {
             amount: precio,
-            currency: 'MXN',
+            currency: currency,
             purchase_description: descripcion,
             redirection_url: {
                 success: `${origin}/confirmacion.html?codigo=${codigo}`,
@@ -82,7 +83,18 @@ app.post('/crear-pago', async (req, res) => {
                     email: email
                 }
             }
-        });
+        };
+
+        // Si es USD, habilitar pagos internacionales (solo Visa/Mastercard)
+        if (currency === 'USD') {
+            clipPayload.custom_payment_options = {
+                international_enabled: true,
+                payment_method_brands: ['visa', 'mastercard'],
+                payment_method_types: ['debit', 'credit']
+            };
+        }
+
+        const clipData = JSON.stringify(clipPayload);
 
         // Autenticación Basic con base64(api_key:secret_key) según docs Clip
         const authToken = Buffer.from(`${CLIP_API_KEY}:${CLIP_SECRET_KEY}`).toString('base64');

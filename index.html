@@ -2713,14 +2713,10 @@
                 return;
             }
             
-            // Obtener precio en MXN (sin formato)
+            // Obtener precio y moneda según idioma
             var precioText = document.getElementById('quote-total').innerText;
-            var precioMXN = parseInt(precioText.replace(/[^0-9]/g, ''));
-            
-            // Si está en USD, convertir a MXN
-            if (precioText.includes('USD')) {
-                precioMXN = precioMXN * Math.round(tipoCambio);
-            }
+            var precioNum = parseInt(precioText.replace(/[^0-9]/g, ''));
+            var moneda = precioText.includes('USD') ? 'USD' : 'MXN';
             
             // Descripción del servicio
             var descripcion = reservationData.servicio + ' - ' + reservationData.origen + ' → ' + reservationData.destino + ' - ' + reservationData.fecha;
@@ -2776,7 +2772,8 @@
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    precio: precioMXN,
+                    precio: precioNum,
+                    moneda: moneda,
                     descripcion: descripcion,
                     codigo: reservationData.codigo,
                     email: email
