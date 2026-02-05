@@ -1,10 +1,18 @@
+require('dotenv').config();
 const express = require('express');
-const Stripe = require('stripe');
 const path = require('path');
 const fs = require('fs');
 
 const app = express();
-const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
+
+// Clip.mx API configuration
+const CLIP_API_KEY = process.env.CLIP_API_KEY;
+const CLIP_SECRET_KEY = process.env.CLIP_SECRET_KEY;
+const CLIP_API_URL = 'https://api-gw.payclip.com/checkout';
+
+function getClipAuthToken() {
+    return Buffer.from(`${CLIP_API_KEY}:${CLIP_SECRET_KEY}`).toString('base64');
+}
 
 app.use(express.json());
 app.use(express.static('.'));
@@ -53,39 +61,96 @@ app.post('/guardar-reserva', (req, res) => {
     }
 });
 
-// Crear sesión de pago
+// Crear pago con Clip.mx
 app.post('/crear-pago', async (req, res) => {
     try {
-        const { precio, descripcion, codigo, email } = req.body;
-        
-        const session = await stripe.checkout.sessions.create({
-            payment_method_types: ['card', 'oxxo'],
-            line_items: [{
-                price_data: {
-                    currency: 'mxn',
-                    product_data: {
-                        name: 'Traslado OPA2',
-                        description: descripcion
-                    },
-                    unit_amount: precio * 100 // Stripe usa centavos
+        const { precio, descripcion, codigo, email, nombre } = req.body;
+
+        const origin = req.headers.origin || req.headers.referer || '';
+
+        const clipResponse = await fetch(CLIP_API_URL, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Basic ${getClipAuthToken()}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                amount: precio, // Clip usa pesos enteros, no centavos
+                currency: 'MXN',
+                purchase_description: descripcion,
+                override_settings: {
+                    payment_method: ['CARD', 'CASH'] // Tarjeta y OXXO
                 },
-                quantity: 1
-            }],
-            mode: 'payment',
-            success_url: `${req.headers.origin}/confirmacion.html?codigo=${codigo}`,
-            cancel_url: `${req.headers.origin}`,
-            customer_email: email,
-            metadata: {
-                codigo: codigo
-            }
+                redirect_url: {
+                    success: `${origin}/confirmacion.html?codigo=${codigo}`,
+                    error: `${origin}`,
+                    default: `${origin}`
+                },
+                webhook_url: `${origin}/webhook/clip`,
+                metadata: {
+                    me_reference_id: codigo,
+                    customer_info: {
+                        name: nombre || '',
+                        email: email || ''
+                    }
+                }
+            })
         });
-        
-        res.json({ url: session.url });
+
+        const clipData = await clipResponse.json();
+
+        if (!clipResponse.ok) {
+            console.error('Error de Clip:', clipData);
+            throw new Error(clipData.message || 'Error al crear pago en Clip');
+        }
+
+        res.json({ url: clipData.payment_request_url });
     } catch (error) {
-        console.error('Error creando sesión:', error);
+        console.error('Error creando pago:', error);
         res.status(500).json({ error: error.message });
     }
 });
+
+// Webhook de Clip.mx para notificaciones de pago
+app.post('/webhook/clip', (req, res) => {
+    try {
+        const { payment_request_id, receipt_no, resource_status, payment_type } = req.body;
+
+        console.log(`Webhook Clip: ${resource_status} | ID: ${payment_request_id} | Recibo: ${receipt_no} | Tipo: ${payment_type}`);
+
+        if (resource_status === 'COMPLETED') {
+            // Actualizar estado de la reserva en CSV
+            const codigo = req.body.metadata?.me_reference_id;
+            if (codigo) {
+                actualizarEstadoReserva(codigo, 'Pagado');
+                console.log(`Reserva ${codigo} marcada como Pagado`);
+            }
+        }
+
+        res.json({ received: true });
+    } catch (error) {
+        console.error('Error en webhook:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Función para actualizar estado de reserva en CSV
+function actualizarEstadoReserva(codigo, nuevoEstado) {
+    try {
+        const csvData = fs.readFileSync(CSV_FILE, 'utf8');
+        const lines = csvData.split('\n');
+        const updatedLines = lines.map(line => {
+            if (line.includes(`"${codigo}"`)) {
+                // Reemplazar estado "Pago en proceso" o "Pendiente" por nuevo estado
+                return line.replace(/"Pago en proceso"|"Pendiente"/, `"${nuevoEstado}"`);
+            }
+            return line;
+        });
+        fs.writeFileSync(CSV_FILE, updatedLines.join('\n'), 'utf8');
+    } catch (error) {
+        console.error('Error actualizando estado:', error);
+    }
+}
 
 // Panel admin - login
 app.post('/admin/login', (req, res) => {

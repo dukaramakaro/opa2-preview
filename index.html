@@ -1306,14 +1306,14 @@
                     <label class="form-label" data-es="Notas adicionales (opcional)" data-en="Additional notes (optional)">Notas adicionales (opcional)</label>
                     <textarea class="form-input" id="client-notes" placeholder="Sillas para niños, equipaje extra, etc." rows="2" style="resize: none;"></textarea>
                 </div>
-                <button class="modal-btn primary" onclick="pagarConStripe()" style="background: #635BFF;" data-es="💳 Pagar con tarjeta" data-en="💳 Pay with card">💳 Pagar con tarjeta</button>
+                <button class="modal-btn primary" onclick="pagarConClip()" style="background: #FC4C02;" data-es="💳 Pagar con tarjeta" data-en="💳 Pay with card">💳 Pagar con tarjeta</button>
                 <button class="modal-btn secondary" onclick="contactarOtraFormaPago()" style="font-size: 14px; padding: 12px;" data-es="Otras formas de pago" data-en="Other payment methods">Otras formas de pago</button>
                 <button class="modal-btn secondary" onclick="showModal('modal-quote')" data-es="Atrás" data-en="Back">Atrás</button>
             </div>
         </div>
     </div>
 
-    <!-- MODAL: Pago (PRÓXIMAMENTE - Stripe) - Descomentar cuando se integre Stripe
+    <!-- MODAL: Pago (Clip.mx integrado via checkout redireccionado)
     <div class="modal-overlay" id="modal-payment">
         <div class="modal">
             <button class="modal-close" onclick="closeModal('modal-payment')">&times;</button>
@@ -1326,7 +1326,7 @@
                 </div>
                 <p class="modal-step" data-es="Paso 3 de 4" data-en="Step 3 of 4">Paso 3 de 4</p>
                 <h3 class="modal-title" data-es="Pago seguro" data-en="Secure payment">Pago seguro</h3>
-                <p class="modal-subtitle" data-es="Procesado por Stripe" data-en="Powered by Stripe">Procesado por Stripe</p>
+                <p class="modal-subtitle" data-es="Procesado por Clip" data-en="Powered by Clip">Procesado por Clip</p>
             </div>
             <div class="modal-body">
                 <div class="payment-card">
@@ -2693,45 +2693,45 @@
             return msg;
         }
         
-        // Pagar con Stripe
-        function pagarConStripe() {
+        // Pagar con Clip.mx
+        function pagarConClip() {
             // Validar campos
             var name = document.getElementById('client-name').value.trim();
             var email = document.getElementById('client-email').value.trim();
             var phone = document.getElementById('client-phone').value.trim();
-            
+
             if (!name || !email || !phone) {
                 alert(currentLang === 'es' ? 'Por favor completa nombre, email y teléfono' : 'Please fill in name, email and phone');
                 return;
             }
-            
+
             if (!email.includes('@') || !email.includes('.')) {
                 alert(currentLang === 'es' ? 'Por favor ingresa un email válido' : 'Please enter a valid email');
                 return;
             }
-            
+
             // Obtener precio en MXN (sin formato)
             var precioText = document.getElementById('quote-total').innerText;
             var precioMXN = parseInt(precioText.replace(/[^0-9]/g, ''));
-            
+
             // Si está en USD, convertir a MXN
             if (precioText.includes('USD')) {
                 precioMXN = precioMXN * Math.round(tipoCambio);
             }
-            
+
             // Descripción del servicio
             var descripcion = reservationData.servicio + ' - ' + reservationData.origen + ' → ' + reservationData.destino + ' - ' + reservationData.fecha;
-            
+
             // Mostrar loading
-            var payBtn = document.querySelector('#modal-details .modal-btn.primary[onclick="pagarConStripe()"]');
+            var payBtn = document.querySelector('#modal-details .modal-btn.primary[onclick="pagarConClip()"]');
             var originalText = payBtn.innerText;
             payBtn.innerText = currentLang === 'es' ? 'Procesando...' : 'Processing...';
             payBtn.disabled = true;
-            
+
             // Primero enviar email y WhatsApp
             var flight = document.getElementById('client-flight').value.trim();
             var notes = document.getElementById('client-notes').value.trim();
-            
+
             var fullData = {
                 nombre: name,
                 email: email,
@@ -2749,10 +2749,10 @@
                 idioma: currentLang,
                 fechaSolicitud: new Date().toLocaleString('es-MX')
             };
-            
+
             // Enviar notificación
             sendReservationEmail(fullData, function() {});
-            
+
             // Guardar en CSV
             fetch('/guardar-reserva', {
                 method: 'POST',
@@ -2767,8 +2767,8 @@
             }).catch(function(err) {
                 console.error('Error guardando en CSV:', err);
             });
-            
-            // Llamar al backend para crear sesión de Stripe
+
+            // Llamar al backend para crear pago con Clip
             fetch('/crear-pago', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -2776,7 +2776,8 @@
                     precio: precioMXN,
                     descripcion: descripcion,
                     codigo: reservationData.codigo,
-                    email: email
+                    email: email,
+                    nombre: name
                 })
             })
             .then(function(response) { return response.json(); })
