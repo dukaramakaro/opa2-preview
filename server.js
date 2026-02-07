@@ -313,6 +313,38 @@ app.post('/admin/nueva-reserva', async (req, res) => {
     }
 });
 
+// Consultar reserva pública (tracking)
+app.get('/consultar-reserva/:codigo', async (req, res) => {
+    const codigo = req.params.codigo;
+    if (!codigo) return res.status(400).json({ error: 'Código requerido' });
+
+    try {
+        const { data, error } = await supabase
+            .from('reservas')
+            .select('codigo, nombre, servicio, origen, destino, fecha_viaje, pasajeros, vehiculo, total, estado, created_at')
+            .eq('codigo', codigo)
+            .single();
+
+        if (error || !data) return res.status(404).json({ error: 'Reserva no encontrada' });
+
+        res.json({
+            codigo: data.codigo,
+            nombre: data.nombre,
+            servicio: data.servicio,
+            origen: data.origen,
+            destino: data.destino,
+            fecha_viaje: data.fecha_viaje,
+            pasajeros: data.pasajeros,
+            vehiculo: data.vehiculo,
+            total: data.total,
+            estado: data.estado,
+            created_at: data.created_at
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Servidor OPA2 corriendo en puerto ${PORT}`);
