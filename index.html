@@ -341,6 +341,9 @@
         .booking-status.confirmed { background: rgba(34, 197, 94, 0.1); color: #16a34a; }
         .booking-status.pending { background: rgba(234, 179, 8, 0.1); color: #ca8a04; }
         .booking-status.completed { background: rgba(59, 130, 246, 0.1); color: #2563eb; }
+        .booking-status.cancelled { background: rgba(239, 68, 68, 0.1); color: #dc2626; }
+        .booking-status.enroute { background: rgba(139, 92, 246, 0.1); color: #7c3aed; }
+        .booking-status.driver { background: rgba(6, 182, 212, 0.1); color: #0891b2; }
         .status-dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
         
         .booking-timeline { display: flex; justify-content: space-between; margin-bottom: 40px; position: relative; }
@@ -1022,79 +1025,43 @@
                 <button class="track-btn" data-es="Buscar" data-en="Search">Buscar</button>
             </div>
             
-            <!-- Booking Result (Demo) -->
+            <!-- Booking Result (Dynamic) -->
             <div class="booking-result" id="booking-result" style="display: none;">
                 <div class="booking-header">
                     <div class="booking-id">
                         <span class="booking-label" data-es="Confirmación" data-en="Confirmation">Confirmación</span>
-                        <span class="booking-number">OPA2-2024-001234</span>
+                        <span class="booking-number" id="track-codigo"></span>
                     </div>
-                    <div class="booking-status confirmed">
+                    <div class="booking-status" id="track-status-badge">
                         <span class="status-dot"></span>
-                        <span data-es="Confirmado" data-en="Confirmed">Confirmado</span>
+                        <span id="track-status-text"></span>
                     </div>
                 </div>
-                
-                <div class="booking-timeline">
-                    <div class="timeline-step completed">
-                        <div class="step-icon">✓</div>
-                        <div class="step-info">
-                            <span class="step-title" data-es="Reservación recibida" data-en="Booking received">Reservación recibida</span>
-                            <span class="step-date">Dec 5, 2024 - 10:30 AM</span>
-                        </div>
-                    </div>
-                    <div class="timeline-step completed">
-                        <div class="step-icon">✓</div>
-                        <div class="step-info">
-                            <span class="step-title" data-es="Pago confirmado" data-en="Payment confirmed">Pago confirmado</span>
-                            <span class="step-date">Dec 5, 2024 - 10:32 AM</span>
-                        </div>
-                    </div>
-                    <div class="timeline-step active">
-                        <div class="step-icon">3</div>
-                        <div class="step-info">
-                            <span class="step-title" data-es="Conductor asignado" data-en="Driver assigned">Conductor asignado</span>
-                            <span class="step-date" data-es="Pendiente" data-en="Pending">Pendiente</span>
-                        </div>
-                    </div>
-                    <div class="timeline-step">
-                        <div class="step-icon">4</div>
-                        <div class="step-info">
-                            <span class="step-title" data-es="En camino" data-en="On the way">En camino</span>
-                            <span class="step-date">-</span>
-                        </div>
-                    </div>
-                    <div class="timeline-step">
-                        <div class="step-icon">5</div>
-                        <div class="step-info">
-                            <span class="step-title" data-es="Completado" data-en="Completed">Completado</span>
-                            <span class="step-date">-</span>
-                        </div>
-                    </div>
-                </div>
-                
+
+                <div class="booking-timeline" id="track-timeline"></div>
+
                 <div class="booking-details">
                     <div class="detail-card">
                         <h4 data-es="Detalles del viaje" data-en="Trip details">Detalles del viaje</h4>
                         <div class="detail-row">
                             <span class="detail-label" data-es="Servicio" data-en="Service">Servicio</span>
-                            <span class="detail-value">Airport Shuttle</span>
+                            <span class="detail-value" id="track-servicio"></span>
                         </div>
                         <div class="detail-row">
-                            <span class="detail-label" data-es="Tipo" data-en="Type">Tipo</span>
-                            <span class="detail-value">OPA2 Elite</span>
+                            <span class="detail-label" data-es="Vehículo" data-en="Vehicle">Vehículo</span>
+                            <span class="detail-value" id="track-vehiculo"></span>
                         </div>
                         <div class="detail-row">
                             <span class="detail-label" data-es="Fecha" data-en="Date">Fecha</span>
-                            <span class="detail-value">Dec 15, 2024</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label" data-es="Hora" data-en="Time">Hora</span>
-                            <span class="detail-value">2:30 PM</span>
+                            <span class="detail-value" id="track-fecha"></span>
                         </div>
                         <div class="detail-row">
                             <span class="detail-label" data-es="Pasajeros" data-en="Passengers">Pasajeros</span>
-                            <span class="detail-value">4</span>
+                            <span class="detail-value" id="track-pasajeros"></span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label" data-es="Total" data-en="Total">Total</span>
+                            <span class="detail-value" id="track-total"></span>
                         </div>
                     </div>
                     <div class="detail-card">
@@ -1104,7 +1071,7 @@
                                 <div class="route-dot"></div>
                                 <div class="route-info">
                                     <span class="route-label" data-es="Origen" data-en="Origin">Origen</span>
-                                    <span class="route-place">Aeropuerto de Cancún (CUN)</span>
+                                    <span class="route-place" id="track-origen"></span>
                                 </div>
                             </div>
                             <div class="route-line"></div>
@@ -1112,37 +1079,19 @@
                                 <div class="route-dot"></div>
                                 <div class="route-info">
                                     <span class="route-label" data-es="Destino" data-en="Destination">Destino</span>
-                                    <span class="route-place">Grand Hyatt Playa del Carmen</span>
+                                    <span class="route-place" id="track-destino"></span>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="detail-card driver-card" style="display: none;">
-                        <h4 data-es="Tu conductor" data-en="Your driver">Tu conductor</h4>
-                        <div class="driver-info">
-                            <div class="driver-avatar">JM</div>
-                            <div class="driver-details">
-                                <span class="driver-name">Juan Martínez</span>
-                                <span class="driver-rating">★ 4.9 (234 viajes)</span>
-                            </div>
-                        </div>
-                        <div class="driver-contact">
-                            <a href="#" class="contact-btn whatsapp">
-                                <svg viewBox="0 0 24 24" fill="currentColor" style="width:18px;height:18px;"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-                                WhatsApp
-                            </a>
-                            <a href="#" class="contact-btn phone">
-                                <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width:18px;height:18px;"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" /></svg>
-                                <span data-es="Llamar" data-en="Call">Llamar</span>
-                            </a>
-                        </div>
-                    </div>
                 </div>
-                
-                <div class="booking-actions">
-                    <button class="action-btn secondary" data-es="Modificar reservación" data-en="Modify booking">Modificar reservación</button>
-                    <button class="action-btn danger" data-es="Cancelar" data-en="Cancel">Cancelar</button>
-                </div>
+            </div>
+
+            <!-- Error message for tracking -->
+            <div id="booking-not-found" style="display: none; text-align: center; padding: 40px; background: white; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.08);">
+                <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width:48px;height:48px;color:#ccc;margin-bottom:16px;"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" /></svg>
+                <p style="font-size:16px;font-weight:600;color:#333;margin-bottom:8px;" data-es="Reservación no encontrada" data-en="Booking not found">Reservación no encontrada</p>
+                <p style="font-size:14px;color:#888;" data-es="Verifica tu código e intenta de nuevo" data-en="Check your code and try again">Verifica tu código e intenta de nuevo</p>
             </div>
         </div>
     </section>
@@ -2247,19 +2196,161 @@
             });
         }
 
-        // Track Booking demo
+        // Track Booking (real lookup)
         var trackBtn = document.querySelector('.track-btn');
         trackBtn.onclick = function() {
-            var input = document.querySelector('.track-input').value;
+            var input = document.querySelector('.track-input').value.trim();
             var result = document.getElementById('booking-result');
-            if (input.length > 0) {
-                result.style.display = 'block';
-                window.scrollTo({
-                    top: result.offsetTop - 100,
-                    behavior: 'smooth'
+            var notFound = document.getElementById('booking-not-found');
+            result.style.display = 'none';
+            notFound.style.display = 'none';
+
+            if (input.length === 0) return;
+
+            trackBtn.disabled = true;
+            trackBtn.textContent = '...';
+
+            fetch('/consultar-reserva/' + encodeURIComponent(input))
+                .then(function(r) {
+                    if (!r.ok) throw new Error('No encontrada');
+                    return r.json();
+                })
+                .then(function(data) {
+                    renderBookingResult(data);
+                    result.style.display = 'block';
+                    notFound.style.display = 'none';
+                    window.scrollTo({ top: result.offsetTop - 100, behavior: 'smooth' });
+                })
+                .catch(function() {
+                    result.style.display = 'none';
+                    notFound.style.display = 'block';
+                    window.scrollTo({ top: notFound.offsetTop - 100, behavior: 'smooth' });
+                })
+                .finally(function() {
+                    trackBtn.disabled = false;
+                    var isEs = document.documentElement.lang !== 'en';
+                    trackBtn.textContent = isEs ? 'Buscar' : 'Search';
                 });
-            }
         };
+
+        // Allow Enter key to trigger search
+        document.querySelector('.track-input').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') trackBtn.click();
+        });
+
+        function renderBookingResult(data) {
+            var isEs = document.documentElement.lang !== 'en';
+
+            // Booking code
+            document.getElementById('track-codigo').textContent = data.codigo || '';
+
+            // Status badge
+            var statusBadge = document.getElementById('track-status-badge');
+            var statusText = document.getElementById('track-status-text');
+            var statusMap = {
+                'Pendiente': { css: 'pending', es: 'Pendiente', en: 'Pending' },
+                'Pago en proceso': { css: 'pending', es: 'Pago en proceso', en: 'Payment processing' },
+                'Pagado': { css: 'confirmed', es: 'Confirmado', en: 'Confirmed' },
+                'Conductor asignado': { css: 'driver', es: 'Conductor asignado', en: 'Driver assigned' },
+                'En camino': { css: 'enroute', es: 'En camino', en: 'On the way' },
+                'Completado': { css: 'completed', es: 'Completado', en: 'Completed' },
+                'Cancelado': { css: 'cancelled', es: 'Cancelado', en: 'Cancelled' }
+            };
+            var statusInfo = statusMap[data.estado] || statusMap['Pendiente'];
+            statusBadge.className = 'booking-status ' + statusInfo.css;
+            statusText.textContent = isEs ? statusInfo.es : statusInfo.en;
+
+            // Trip details
+            document.getElementById('track-servicio').textContent = data.servicio || '-';
+            document.getElementById('track-vehiculo').textContent = data.vehiculo || '-';
+            document.getElementById('track-fecha').textContent = data.fecha_viaje || '-';
+            document.getElementById('track-pasajeros').textContent = data.pasajeros || '-';
+            document.getElementById('track-total').textContent = data.total || '-';
+            document.getElementById('track-origen').textContent = data.origen || '-';
+            document.getElementById('track-destino').textContent = data.destino || '-';
+
+            // Timeline
+            renderTimeline(data.estado, data.created_at, isEs);
+        }
+
+        function renderTimeline(estado, createdAt, isEs) {
+            var steps = [
+                { es: 'Reservación recibida', en: 'Booking received', num: 1 },
+                { es: 'Pago confirmado', en: 'Payment confirmed', num: 2 },
+                { es: 'Conductor asignado', en: 'Driver assigned', num: 3 },
+                { es: 'En camino', en: 'On the way', num: 4 },
+                { es: 'Completado', en: 'Completed', num: 5 }
+            ];
+
+            // Map estado to completed step index (0-based)
+            // activeStep = the step that is currently in progress (not yet completed)
+            var stateToStep = {
+                'Pendiente': 0,
+                'Pago en proceso': 1,
+                'Pagado': 2,
+                'Conductor asignado': 3,
+                'En camino': 4,
+                'Completado': 5,
+                'Cancelado': -1
+            };
+
+            var currentStep = stateToStep[estado] !== undefined ? stateToStep[estado] : 0;
+            var isCancelled = estado === 'Cancelado';
+
+            var createdDate = '';
+            if (createdAt) {
+                try {
+                    createdDate = new Date(createdAt).toLocaleDateString(isEs ? 'es-MX' : 'en-US', {
+                        year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+                    });
+                } catch(e) { createdDate = createdAt; }
+            }
+
+            var html = '';
+            for (var i = 0; i < steps.length; i++) {
+                var stepClass = '';
+                var iconContent = '';
+                var dateText = '';
+
+                if (isCancelled) {
+                    stepClass = '';
+                    iconContent = (i + 1).toString();
+                    dateText = i === 0 ? createdDate : '-';
+                } else if (i < currentStep) {
+                    stepClass = 'completed';
+                    iconContent = '✓';
+                    dateText = i === 0 ? createdDate : '';
+                } else if (i === currentStep) {
+                    stepClass = 'active';
+                    iconContent = (i + 1).toString();
+                    dateText = isEs ? 'En curso' : 'In progress';
+                } else {
+                    stepClass = '';
+                    iconContent = (i + 1).toString();
+                    dateText = isEs ? 'Pendiente' : 'Pending';
+                }
+
+                html += '<div class="timeline-step ' + stepClass + '">' +
+                    '<div class="step-icon">' + iconContent + '</div>' +
+                    '<div class="step-info">' +
+                        '<span class="step-title">' + (isEs ? steps[i].es : steps[i].en) + '</span>' +
+                        '<span class="step-date">' + (dateText || '-') + '</span>' +
+                    '</div>' +
+                '</div>';
+            }
+
+            if (isCancelled) {
+                html += '<div class="timeline-step active" style="flex:0.5;">' +
+                    '<div class="step-icon" style="background:#dc2626;border-color:#dc2626;color:white;">✕</div>' +
+                    '<div class="step-info">' +
+                        '<span class="step-title" style="color:#dc2626;">' + (isEs ? 'Cancelado' : 'Cancelled') + '</span>' +
+                        '<span class="step-date">-</span>' +
+                    '</div>' +
+                '</div>';
+            }
+
+            document.getElementById('track-timeline').innerHTML = html;
+        }
 
         // Smooth scroll for nav links
         var navLinks = document.querySelectorAll('.nav-links a[href^="#"]');

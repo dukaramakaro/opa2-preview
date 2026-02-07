@@ -219,6 +219,18 @@
             background: #f8d7da;
             color: #721c24;
         }
+        .badge-driver {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+        .badge-enroute {
+            background: #e8daef;
+            color: #6c3483;
+        }
+        .badge-completed {
+            background: #d5f5e3;
+            color: #1e8449;
+        }
         .status-menu {
             display: none;
             position: absolute;
@@ -437,9 +449,12 @@
                 <div class="modal-field">
                     <label>Estado</label>
                     <select id="nr-estado">
-                        <option value="Pagado">Pagado</option>
                         <option value="Pendiente" selected>Pendiente</option>
                         <option value="Pago en proceso">Pago en proceso</option>
+                        <option value="Pagado">Pagado</option>
+                        <option value="Conductor asignado">Conductor asignado</option>
+                        <option value="En camino">En camino</option>
+                        <option value="Completado">Completado</option>
                     </select>
                 </div>
                 <div class="modal-field">
@@ -521,6 +536,9 @@
         function badgeClass(estado) {
             if (estado === 'Pagado') return 'badge-paid';
             if (estado === 'Cancelado') return 'badge-cancelled';
+            if (estado === 'Conductor asignado') return 'badge-driver';
+            if (estado === 'En camino') return 'badge-enroute';
+            if (estado === 'Completado') return 'badge-completed';
             return 'badge-pending';
         }
 
@@ -561,9 +579,12 @@
                         '<td class="status-cell">' +
                             '<span class="badge ' + badgeClass(r.Estado) + '" onclick="toggleStatusMenu(this, \'' + (r.Codigo || '') + '\')">' + (r.Estado || 'Pendiente') + '</span>' +
                             '<div class="status-menu" id="menu-' + (r.Codigo || '') + '">' +
-                                '<button class="status-option" onclick="cambiarEstado(\'' + (r.Codigo || '') + '\', \'Pagado\')">Pagado</button>' +
-                                '<button class="status-option" onclick="cambiarEstado(\'' + (r.Codigo || '') + '\', \'Pago en proceso\')">Pago en proceso</button>' +
                                 '<button class="status-option" onclick="cambiarEstado(\'' + (r.Codigo || '') + '\', \'Pendiente\')">Pendiente</button>' +
+                                '<button class="status-option" onclick="cambiarEstado(\'' + (r.Codigo || '') + '\', \'Pago en proceso\')">Pago en proceso</button>' +
+                                '<button class="status-option" onclick="cambiarEstado(\'' + (r.Codigo || '') + '\', \'Pagado\')">Pagado</button>' +
+                                '<button class="status-option" onclick="cambiarEstado(\'' + (r.Codigo || '') + '\', \'Conductor asignado\')">Conductor asignado</button>' +
+                                '<button class="status-option" onclick="cambiarEstado(\'' + (r.Codigo || '') + '\', \'En camino\')">En camino</button>' +
+                                '<button class="status-option" onclick="cambiarEstado(\'' + (r.Codigo || '') + '\', \'Completado\')">Completado</button>' +
                                 '<button class="status-option" onclick="cambiarEstado(\'' + (r.Codigo || '') + '\', \'Cancelado\')">Cancelado</button>' +
                             '</div>' +
                         '</td>' +
