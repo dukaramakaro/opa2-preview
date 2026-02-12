@@ -74,7 +74,7 @@ app.post('/crear-pago', async (req, res) => {
             return res.status(500).json({ error: 'CLIP_API_KEY no configurada' });
         }
 
-        const origin = req.headers.origin || req.headers.referer || 'https://opa2.mx';
+        const origin = req.headers.origin || req.headers.referer || 'https://opa2.com.mx';
 
         const clipPayload = {
             amount: precio,
