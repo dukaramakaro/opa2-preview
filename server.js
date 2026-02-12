@@ -313,6 +313,26 @@ app.post('/admin/nueva-reserva', async (req, res) => {
     }
 });
 
+// Admin - eliminar reserva
+app.delete('/admin/eliminar-reserva/:codigo', async (req, res) => {
+    if (!validarAdmin(req)) return res.status(401).json({ error: 'No autorizado' });
+
+    const codigo = req.params.codigo;
+    if (!codigo) return res.status(400).json({ error: 'Código requerido' });
+
+    try {
+        const { error } = await supabase
+            .from('reservas')
+            .delete()
+            .eq('codigo', codigo);
+
+        if (error) return res.status(500).json({ error: error.message });
+        res.json({ success: true });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 // Consultar reserva pública (tracking)
 app.get('/consultar-reserva/:codigo', async (req, res) => {
     const codigo = req.params.codigo;
