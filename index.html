@@ -1123,7 +1123,7 @@
                     <div class="google-rating-stars">★★★★★</div>
                 </div>
                 <p class="google-reviews-count">
-                    <strong data-es="12 reseñas" data-en="12 reviews">12 reseñas</strong> 
+                    <strong data-es="15 reseñas" data-en="15 reviews">15 reseñas</strong>
                     <span data-es="en Google" data-en="on Google">en Google</span>
                 </p>
                 <a href="https://maps.app.goo.gl/NqrtFw94XZaqKS9t6" target="_blank" class="google-link-btn">
@@ -3035,6 +3035,7 @@
 
                 if (!searchResponse.ok) {
                     console.error('Error fetching place:', await searchResponse.text());
+                    updateReviewsUI({});
                     return;
                 }
 
@@ -3042,6 +3043,7 @@
 
                 if (!searchData.places || searchData.places.length === 0) {
                     console.error('No se encontró el negocio');
+                    updateReviewsUI({});
                     return;
                 }
 
@@ -3052,12 +3054,13 @@
 
             } catch (error) {
                 console.error('Error loading Google reviews:', error);
+                updateReviewsUI({});
             }
         }
 
         function updateReviewsUI(placeDetails) {
             const rating = placeDetails.rating || 5.0;
-            const reviewCount = placeDetails.userRatingCount || 12;
+            const reviewCount = placeDetails.userRatingCount || 15;
 
             // Actualizar el rating
             const ratingScoreEl = document.querySelector('.google-rating-score');
