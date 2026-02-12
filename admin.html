@@ -260,6 +260,151 @@
         }
         .status-option:hover { background: #f5f5f5; }
         .status-cell { position: relative; }
+        .btn-delete {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 6px 8px;
+            border-radius: 8px;
+            transition: all 0.2s;
+            color: #b0b0b0;
+        }
+        .btn-delete:hover {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+        .btn-delete svg { width: 16px; height: 16px; vertical-align: middle; }
+        .toolbar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .search-input {
+            flex: 1;
+            min-width: 200px;
+            padding: 10px 14px;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            font-family: 'Sora', sans-serif;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        .search-input:focus { outline: none; border-color: #E63946; }
+        .filter-select {
+            padding: 10px 14px;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            font-family: 'Sora', sans-serif;
+            font-size: 14px;
+            background: white;
+            cursor: pointer;
+            min-width: 160px;
+        }
+        .filter-select:focus { outline: none; border-color: #E63946; }
+        .sort-select {
+            padding: 10px 14px;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            font-family: 'Sora', sans-serif;
+            font-size: 14px;
+            background: white;
+            cursor: pointer;
+        }
+        .sort-select:focus { outline: none; border-color: #E63946; }
+        .toggle-completed {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 14px;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            background: white;
+            cursor: pointer;
+            font-family: 'Sora', sans-serif;
+            font-size: 13px;
+            font-weight: 500;
+            color: #6b6b6b;
+            transition: all 0.2s;
+            user-select: none;
+            white-space: nowrap;
+        }
+        .toggle-completed.active {
+            background: #f0fdf4;
+            border-color: #22c55e;
+            color: #166534;
+        }
+        .toggle-completed .toggle-dot {
+            width: 18px;
+            height: 18px;
+            border-radius: 4px;
+            border: 2px solid #d0d0d0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        .toggle-completed.active .toggle-dot {
+            background: #22c55e;
+            border-color: #22c55e;
+        }
+        .toggle-completed.active .toggle-dot::after {
+            content: '✓';
+            color: white;
+            font-size: 11px;
+            font-weight: 700;
+        }
+        th.sortable {
+            cursor: pointer;
+            user-select: none;
+            transition: color 0.2s;
+        }
+        th.sortable:hover { color: #E63946; }
+        th.sortable .sort-arrow { font-size: 10px; margin-left: 4px; opacity: 0.4; }
+        th.sortable.active .sort-arrow { opacity: 1; color: #E63946; }
+        .confirm-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 300;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .confirm-overlay.show { display: flex; }
+        .confirm-box {
+            background: white;
+            border-radius: 16px;
+            padding: 28px;
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+        .confirm-box h3 { font-size: 18px; margin-bottom: 8px; }
+        .confirm-box p { color: #6b6b6b; font-size: 14px; margin-bottom: 20px; }
+        .confirm-box .confirm-code { font-weight: 700; color: #E63946; }
+        .confirm-buttons { display: flex; gap: 10px; }
+        .confirm-buttons button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            font-family: 'Sora', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .confirm-btn-delete { background: #dc2626; color: white; }
+        .confirm-btn-delete:hover { background: #b91c1c; }
+        .confirm-btn-cancel { background: #f0f0f0; color: #333; }
+        .results-count {
+            font-size: 13px;
+            color: #6b6b6b;
+            padding: 0 4px;
+            white-space: nowrap;
+        }
         .empty-state {
             text-align: center;
             padding: 60px 20px;
@@ -372,6 +517,32 @@
         </div>
 
         <div class="table-container">
+            <div class="toolbar">
+                <input type="text" class="search-input" id="search-input" placeholder="Buscar por nombre, codigo, destino..." oninput="aplicarFiltros()">
+                <select class="filter-select" id="filter-estado" onchange="aplicarFiltros()">
+                    <option value="">Todos los estados</option>
+                    <option value="Pendiente">Pendiente</option>
+                    <option value="Pago en proceso">Pago en proceso</option>
+                    <option value="Pagado">Pagado</option>
+                    <option value="Conductor asignado">Conductor asignado</option>
+                    <option value="En camino">En camino</option>
+                    <option value="Completado">Completado</option>
+                    <option value="Cancelado">Cancelado</option>
+                </select>
+                <select class="sort-select" id="sort-select" onchange="aplicarFiltros()">
+                    <option value="fecha-desc">Recientes primero</option>
+                    <option value="fecha-asc">Antiguos primero</option>
+                    <option value="viaje-asc">Fecha viaje (prox.)</option>
+                    <option value="viaje-desc">Fecha viaje (lejano)</option>
+                    <option value="nombre-asc">Nombre A-Z</option>
+                    <option value="nombre-desc">Nombre Z-A</option>
+                </select>
+                <div class="toggle-completed" id="toggle-finalizadas" onclick="toggleFinalizadas()">
+                    <div class="toggle-dot"></div>
+                    Ocultar finalizadas
+                </div>
+                <span class="results-count" id="results-count"></span>
+            </div>
             <table id="reservas-table">
                 <thead>
                     <tr>
@@ -384,10 +555,23 @@
                         <th>Viaje</th>
                         <th>Total</th>
                         <th>Estado</th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody id="reservas-body"></tbody>
             </table>
+        </div>
+
+        <!-- Confirm Delete Dialog -->
+        <div class="confirm-overlay" id="confirm-delete">
+            <div class="confirm-box">
+                <h3>Eliminar reserva</h3>
+                <p>¿Seguro que quieres eliminar la reserva <span class="confirm-code" id="confirm-codigo"></span>? Esta acción no se puede deshacer.</p>
+                <div class="confirm-buttons">
+                    <button class="confirm-btn-cancel" onclick="cerrarConfirmDelete()">Cancelar</button>
+                    <button class="confirm-btn-delete" id="confirm-delete-btn" onclick="confirmarEliminar()">Eliminar</button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -475,6 +659,17 @@
 
     <script>
         let authToken = localStorage.getItem('opa2_auth');
+        let todasLasReservas = [];
+        let ocultarFinalizadas = localStorage.getItem('opa2_ocultar_finalizadas') === 'true';
+        let codigoAEliminar = null;
+
+        // Restaurar estado del toggle
+        if (ocultarFinalizadas) {
+            document.addEventListener('DOMContentLoaded', function() {
+                var toggle = document.getElementById('toggle-finalizadas');
+                if (toggle) toggle.classList.add('active');
+            });
+        }
 
         if (authToken) {
             fetch('/admin/validate', {
@@ -501,7 +696,6 @@
 
         function login() {
             const password = document.getElementById('password').value;
-
             fetch('/admin/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -517,9 +711,7 @@
                     alert('Contraseña incorrecta');
                 }
             })
-            .catch(function() {
-                alert('Error de conexión');
-            });
+            .catch(function() { alert('Error de conexión'); });
         }
 
         function logout() {
@@ -530,6 +722,9 @@
         function loadDashboard() {
             document.getElementById('login-view').style.display = 'none';
             document.getElementById('dashboard-view').style.display = 'block';
+            if (ocultarFinalizadas) {
+                document.getElementById('toggle-finalizadas').classList.add('active');
+            }
             cargarReservas();
         }
 
@@ -548,49 +743,120 @@
             })
             .then(r => r.json())
             .then(data => {
-                const reservas = data.reservas || [];
-
-                // Stats
-                document.getElementById('stat-total').textContent = reservas.length;
-                document.getElementById('stat-paid').textContent = reservas.filter(r => r.Estado === 'Pagado').length;
-                document.getElementById('stat-pending').textContent = reservas.filter(r => r.Estado !== 'Pagado' && r.Estado !== 'Cancelado').length;
-
-                const today = new Date().toISOString().split('T')[0];
-                var todayCount = reservas.filter(function(r) { return r.Fecha && r.Fecha.startsWith(today); }).length;
-                document.getElementById('stat-today').textContent = todayCount;
-
-                // Table
-                const tbody = document.getElementById('reservas-body');
-                if (reservas.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="9" class="empty-state"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" /></svg><p>No hay reservas aún</p></td></tr>';
-                    return;
-                }
-
-                tbody.innerHTML = reservas.map(function(r) {
-                    return '<tr>' +
-                        '<td>' + formatDate(r.Fecha) + '</td>' +
-                        '<td><strong>' + (r.Codigo || '') + '</strong></td>' +
-                        '<td>' + (r.Nombre || '') + '</td>' +
-                        '<td>' + (r.Email || '') + '<br><small style="color:#6b6b6b">' + (r.Telefono || '') + '</small></td>' +
-                        '<td>' + (r.Servicio || '') + '</td>' +
-                        '<td>' + (r.Origen || '') + ' &rarr; ' + (r.Destino || '') + '</td>' +
-                        '<td>' + (r.FechaViaje || '') + '<br><small style="color:#6b6b6b">' + (r.Pasajeros || '') + ' pax</small></td>' +
-                        '<td><strong>' + (r.Total || '') + '</strong></td>' +
-                        '<td class="status-cell">' +
-                            '<span class="badge ' + badgeClass(r.Estado) + '" onclick="toggleStatusMenu(this, \'' + (r.Codigo || '') + '\')">' + (r.Estado || 'Pendiente') + '</span>' +
-                            '<div class="status-menu" id="menu-' + (r.Codigo || '') + '">' +
-                                '<button class="status-option" onclick="cambiarEstado(\'' + (r.Codigo || '') + '\', \'Pendiente\')">Pendiente</button>' +
-                                '<button class="status-option" onclick="cambiarEstado(\'' + (r.Codigo || '') + '\', \'Pago en proceso\')">Pago en proceso</button>' +
-                                '<button class="status-option" onclick="cambiarEstado(\'' + (r.Codigo || '') + '\', \'Pagado\')">Pagado</button>' +
-                                '<button class="status-option" onclick="cambiarEstado(\'' + (r.Codigo || '') + '\', \'Conductor asignado\')">Conductor asignado</button>' +
-                                '<button class="status-option" onclick="cambiarEstado(\'' + (r.Codigo || '') + '\', \'En camino\')">En camino</button>' +
-                                '<button class="status-option" onclick="cambiarEstado(\'' + (r.Codigo || '') + '\', \'Completado\')">Completado</button>' +
-                                '<button class="status-option" onclick="cambiarEstado(\'' + (r.Codigo || '') + '\', \'Cancelado\')">Cancelado</button>' +
-                            '</div>' +
-                        '</td>' +
-                    '</tr>';
-                }).join('');
+                todasLasReservas = data.reservas || [];
+                actualizarStats(todasLasReservas);
+                aplicarFiltros();
             });
+        }
+
+        function actualizarStats(reservas) {
+            document.getElementById('stat-total').textContent = reservas.length;
+            document.getElementById('stat-paid').textContent = reservas.filter(r => r.Estado === 'Pagado').length;
+            document.getElementById('stat-pending').textContent = reservas.filter(r => r.Estado !== 'Pagado' && r.Estado !== 'Cancelado' && r.Estado !== 'Completado').length;
+
+            const today = new Date().toISOString().split('T')[0];
+            var todayCount = reservas.filter(function(r) { return r.Fecha && r.Fecha.startsWith(today); }).length;
+            document.getElementById('stat-today').textContent = todayCount;
+        }
+
+        function aplicarFiltros() {
+            var busqueda = (document.getElementById('search-input').value || '').toLowerCase().trim();
+            var filtroEstado = document.getElementById('filter-estado').value;
+            var ordenar = document.getElementById('sort-select').value;
+
+            var reservas = todasLasReservas.slice();
+
+            // Ocultar finalizadas
+            if (ocultarFinalizadas) {
+                reservas = reservas.filter(function(r) {
+                    return r.Estado !== 'Completado' && r.Estado !== 'Cancelado';
+                });
+            }
+
+            // Filtro por estado
+            if (filtroEstado) {
+                reservas = reservas.filter(function(r) { return r.Estado === filtroEstado; });
+            }
+
+            // Búsqueda
+            if (busqueda) {
+                reservas = reservas.filter(function(r) {
+                    var texto = [r.Nombre, r.Codigo, r.Email, r.Telefono, r.Servicio, r.Origen, r.Destino, r.Total, r.Estado].join(' ').toLowerCase();
+                    return texto.indexOf(busqueda) !== -1;
+                });
+            }
+
+            // Ordenar
+            reservas.sort(function(a, b) {
+                if (ordenar === 'fecha-desc') return new Date(b.Fecha || 0) - new Date(a.Fecha || 0);
+                if (ordenar === 'fecha-asc') return new Date(a.Fecha || 0) - new Date(b.Fecha || 0);
+                if (ordenar === 'viaje-asc') return parseFechaViaje(a.FechaViaje) - parseFechaViaje(b.FechaViaje);
+                if (ordenar === 'viaje-desc') return parseFechaViaje(b.FechaViaje) - parseFechaViaje(a.FechaViaje);
+                if (ordenar === 'nombre-asc') return (a.Nombre || '').localeCompare(b.Nombre || '');
+                if (ordenar === 'nombre-desc') return (b.Nombre || '').localeCompare(a.Nombre || '');
+                return 0;
+            });
+
+            // Mostrar contador
+            var countEl = document.getElementById('results-count');
+            if (busqueda || filtroEstado || ocultarFinalizadas) {
+                countEl.textContent = reservas.length + ' de ' + todasLasReservas.length + ' reservas';
+            } else {
+                countEl.textContent = reservas.length + ' reservas';
+            }
+
+            renderTabla(reservas);
+        }
+
+        function parseFechaViaje(fecha) {
+            if (!fecha) return new Date(0);
+            try { return new Date(fecha); } catch(e) { return new Date(0); }
+        }
+
+        function toggleFinalizadas() {
+            ocultarFinalizadas = !ocultarFinalizadas;
+            localStorage.setItem('opa2_ocultar_finalizadas', ocultarFinalizadas);
+            document.getElementById('toggle-finalizadas').classList.toggle('active', ocultarFinalizadas);
+            aplicarFiltros();
+        }
+
+        function renderTabla(reservas) {
+            const tbody = document.getElementById('reservas-body');
+            if (reservas.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="10" class="empty-state"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" /></svg><p>No hay reservas con estos filtros</p></td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = reservas.map(function(r) {
+                var codigo = (r.Codigo || '').replace(/'/g, "\\'");
+                return '<tr>' +
+                    '<td>' + formatDate(r.Fecha) + '</td>' +
+                    '<td><strong>' + (r.Codigo || '') + '</strong></td>' +
+                    '<td>' + (r.Nombre || '') + '</td>' +
+                    '<td>' + (r.Email || '') + '<br><small style="color:#6b6b6b">' + (r.Telefono || '') + '</small></td>' +
+                    '<td>' + (r.Servicio || '') + '</td>' +
+                    '<td>' + (r.Origen || '') + ' &rarr; ' + (r.Destino || '') + '</td>' +
+                    '<td>' + (r.FechaViaje || '') + '<br><small style="color:#6b6b6b">' + (r.Pasajeros || '') + ' pax</small></td>' +
+                    '<td><strong>' + (r.Total || '') + '</strong></td>' +
+                    '<td class="status-cell">' +
+                        '<span class="badge ' + badgeClass(r.Estado) + '" onclick="toggleStatusMenu(this, \'' + codigo + '\')">' + (r.Estado || 'Pendiente') + '</span>' +
+                        '<div class="status-menu" id="menu-' + (r.Codigo || '') + '">' +
+                            '<button class="status-option" onclick="cambiarEstado(\'' + codigo + '\', \'Pendiente\')">Pendiente</button>' +
+                            '<button class="status-option" onclick="cambiarEstado(\'' + codigo + '\', \'Pago en proceso\')">Pago en proceso</button>' +
+                            '<button class="status-option" onclick="cambiarEstado(\'' + codigo + '\', \'Pagado\')">Pagado</button>' +
+                            '<button class="status-option" onclick="cambiarEstado(\'' + codigo + '\', \'Conductor asignado\')">Conductor asignado</button>' +
+                            '<button class="status-option" onclick="cambiarEstado(\'' + codigo + '\', \'En camino\')">En camino</button>' +
+                            '<button class="status-option" onclick="cambiarEstado(\'' + codigo + '\', \'Completado\')">Completado</button>' +
+                            '<button class="status-option" onclick="cambiarEstado(\'' + codigo + '\', \'Cancelado\')">Cancelado</button>' +
+                        '</div>' +
+                    '</td>' +
+                    '<td>' +
+                        '<button class="btn-delete" onclick="abrirConfirmDelete(\'' + codigo + '\')" title="Eliminar reserva">' +
+                            '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>' +
+                        '</button>' +
+                    '</td>' +
+                '</tr>';
+            }).join('');
         }
 
         function formatDate(fecha) {
@@ -602,13 +868,11 @@
         }
 
         function toggleStatusMenu(badge, codigo) {
-            // Cerrar todos los menús abiertos
             document.querySelectorAll('.status-menu.show').forEach(function(m) { m.classList.remove('show'); });
             var menu = document.getElementById('menu-' + codigo);
             if (menu) menu.classList.toggle('show');
         }
 
-        // Cerrar menús al hacer clic fuera
         document.addEventListener('click', function(e) {
             if (!e.target.classList.contains('badge') && !e.target.classList.contains('status-option')) {
                 document.querySelectorAll('.status-menu.show').forEach(function(m) { m.classList.remove('show'); });
@@ -627,7 +891,7 @@
             .then(r => r.json())
             .then(function(data) {
                 if (data.success) {
-                    cargarReservas(); // Recargar tabla
+                    cargarReservas();
                 } else {
                     alert('Error al actualizar estado');
                 }
@@ -635,6 +899,51 @@
             .catch(function() { alert('Error de conexión'); });
         }
 
+        // === Eliminar reserva ===
+        function abrirConfirmDelete(codigo) {
+            codigoAEliminar = codigo;
+            document.getElementById('confirm-codigo').textContent = codigo;
+            document.getElementById('confirm-delete').classList.add('show');
+        }
+
+        function cerrarConfirmDelete() {
+            codigoAEliminar = null;
+            document.getElementById('confirm-delete').classList.remove('show');
+        }
+
+        function confirmarEliminar() {
+            if (!codigoAEliminar) return;
+            var btn = document.getElementById('confirm-delete-btn');
+            btn.textContent = 'Eliminando...';
+            btn.disabled = true;
+
+            fetch('/admin/eliminar-reserva/' + encodeURIComponent(codigoAEliminar), {
+                method: 'DELETE',
+                headers: { 'Authorization': 'Bearer ' + authToken }
+            })
+            .then(r => r.json())
+            .then(function(data) {
+                btn.textContent = 'Eliminar';
+                btn.disabled = false;
+                if (data.success) {
+                    cerrarConfirmDelete();
+                    cargarReservas();
+                } else {
+                    alert('Error al eliminar: ' + (data.error || 'Error desconocido'));
+                }
+            })
+            .catch(function() {
+                btn.textContent = 'Eliminar';
+                btn.disabled = false;
+                alert('Error de conexión');
+            });
+        }
+
+        document.getElementById('confirm-delete').addEventListener('click', function(e) {
+            if (e.target === this) cerrarConfirmDelete();
+        });
+
+        // === CSV / Nueva Reserva ===
         function descargarCSV() {
             fetch('/admin/descargar', {
                 headers: { 'Authorization': 'Bearer ' + authToken }
@@ -662,7 +971,6 @@
 
         function cerrarModal() {
             document.getElementById('modal-nueva').classList.remove('show');
-            // Limpiar campos
             ['nr-nombre','nr-email','nr-telefono','nr-vuelo','nr-servicio','nr-pasajeros','nr-origen','nr-destino','nr-fecha','nr-total','nr-vehiculo','nr-notas'].forEach(function(id) {
                 document.getElementById(id).value = '';
             });
@@ -710,7 +1018,6 @@
             .catch(function() { alert('Error de conexión'); });
         }
 
-        // Cerrar modal al hacer clic fuera
         document.getElementById('modal-nueva').addEventListener('click', function(e) {
             if (e.target === this) cerrarModal();
         });
