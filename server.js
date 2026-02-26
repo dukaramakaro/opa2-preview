@@ -113,58 +113,6 @@ app.post('/guardar-reserva', async (req, res) => {
             return res.status(500).json({ error: error.message });
         }
 
-        // WhatsApp al admin: notificación de nueva reserva
-        const adminMsg = `🚐 *NUEVA RESERVACIÓN OPA2*\n\n` +
-            `📋 *Código:* ${data.codigo}\n` +
-            `━━━━━━━━━━━━━━━━\n\n` +
-            `👤 *CLIENTE*\n` +
-            `Nombre: ${data.nombre}\n` +
-            `Email: ${data.email}\n` +
-            `Teléfono: ${data.telefono}\n` +
-            `Vuelo: ${data.vuelo || 'No especificado'}\n` +
-            `Notas: ${data.notas || 'Sin notas'}\n\n` +
-            `🚗 *SERVICIO*\n` +
-            `Tipo: ${data.servicio}\n` +
-            `Origen: ${data.origen}\n` +
-            `Destino: ${data.destino}\n` +
-            `Fecha: ${data.fecha}\n` +
-            `Pasajeros: ${data.pasajeros}\n` +
-            `Vehículo: ${data.vehiculo}\n\n` +
-            `💰 *Total:* ${data.total}\n` +
-            `📊 *Estado:* ${data.estado || 'Pendiente'}`;
-        enviarWhatsApp(ADMIN_WHATSAPP, adminMsg);
-
-        // WhatsApp al cliente: confirmación de reserva
-        if (data.telefono) {
-            const lang = data.idioma || 'es';
-            const clientMsg = lang === 'es'
-                ? `¡Hola ${data.nombre}! 🚐\n\n` +
-                  `Tu reservación con *OPA2 Transfers* ha sido registrada exitosamente.\n\n` +
-                  `📋 *Código de reserva:* ${data.codigo}\n\n` +
-                  `🚗 *Detalles del servicio:*\n` +
-                  `• Origen: ${data.origen}\n` +
-                  `• Destino: ${data.destino}\n` +
-                  `• Fecha: ${data.fecha}\n` +
-                  `• Pasajeros: ${data.pasajeros}\n` +
-                  `• Vehículo: ${data.vehiculo}\n` +
-                  `• Total: ${data.total}\n\n` +
-                  `Te contactaremos pronto con los detalles de tu conductor.\n\n` +
-                  `¡Gracias por elegir OPA2 Transfers! 🌴`
-                : `Hello ${data.nombre}! 🚐\n\n` +
-                  `Your reservation with *OPA2 Transfers* has been successfully registered.\n\n` +
-                  `📋 *Booking code:* ${data.codigo}\n\n` +
-                  `🚗 *Service details:*\n` +
-                  `• Origin: ${data.origen}\n` +
-                  `• Destination: ${data.destino}\n` +
-                  `• Date: ${data.fecha}\n` +
-                  `• Passengers: ${data.pasajeros}\n` +
-                  `• Vehicle: ${data.vehiculo}\n` +
-                  `• Total: ${data.total}\n\n` +
-                  `We will contact you soon with your driver details.\n\n` +
-                  `Thank you for choosing OPA2 Transfers! 🌴`;
-            enviarWhatsApp(data.telefono, clientMsg);
-        }
-
         res.json({ success: true });
     } catch (error) {
         console.error('Error guardando reserva:', error);
@@ -370,26 +318,50 @@ app.post('/confirmar-pago', async (req, res) => {
             .eq('codigo', codigo)
             .single();
 
-        if (reserva && reserva.telefono) {
-            const lang = reserva.idioma || 'es';
-            const clientMsg = lang === 'es'
-                ? `¡Hola ${reserva.nombre}! ✅\n\n` +
-                  `Tu pago ha sido *confirmado* exitosamente.\n\n` +
-                  `📋 *Código:* ${codigo}\n` +
-                  `🚗 ${reserva.origen} → ${reserva.destino}\n` +
-                  `📅 ${reserva.fecha_viaje}\n` +
-                  `💰 Total: ${reserva.total}\n\n` +
-                  `Te contactaremos pronto con los detalles de tu conductor.\n\n` +
-                  `¡Gracias por elegir OPA2 Transfers! 🌴`
-                : `Hello ${reserva.nombre}! ✅\n\n` +
-                  `Your payment has been *confirmed* successfully.\n\n` +
-                  `📋 *Code:* ${codigo}\n` +
-                  `🚗 ${reserva.origen} → ${reserva.destino}\n` +
-                  `📅 ${reserva.fecha_viaje}\n` +
-                  `💰 Total: ${reserva.total}\n\n` +
-                  `We will contact you soon with your driver details.\n\n` +
-                  `Thank you for choosing OPA2 Transfers! 🌴`;
-            enviarWhatsApp(reserva.telefono, clientMsg);
+        if (reserva) {
+            // WhatsApp al admin: notificación de reserva pagada
+            const adminMsg = `🚐 *RESERVACIÓN PAGADA - OPA2*\n\n` +
+                `📋 *Código:* ${codigo}\n` +
+                `━━━━━━━━━━━━━━━━\n\n` +
+                `👤 *CLIENTE*\n` +
+                `Nombre: ${reserva.nombre}\n` +
+                `Email: ${reserva.email}\n` +
+                `Teléfono: ${reserva.telefono}\n` +
+                `Vuelo: ${reserva.vuelo || 'No especificado'}\n` +
+                `Notas: ${reserva.notas || 'Sin notas'}\n\n` +
+                `🚗 *SERVICIO*\n` +
+                `Tipo: ${reserva.servicio}\n` +
+                `Origen: ${reserva.origen}\n` +
+                `Destino: ${reserva.destino}\n` +
+                `Fecha: ${reserva.fecha_viaje}\n` +
+                `Pasajeros: ${reserva.pasajeros}\n` +
+                `Vehículo: ${reserva.vehiculo}\n\n` +
+                `💰 *Total:* ${reserva.total}\n` +
+                `✅ *Estado:* Pagado`;
+            enviarWhatsApp(ADMIN_WHATSAPP, adminMsg);
+
+            // WhatsApp al cliente: confirmación de pago
+            if (reserva.telefono) {
+                const lang = reserva.idioma || 'es';
+                const clientMsg = lang === 'es'
+                    ? `¡Hola ${reserva.nombre}! ✅\n\n` +
+                      `Tu pago ha sido *confirmado* exitosamente.\n\n` +
+                      `📋 *Código:* ${codigo}\n` +
+                      `🚗 ${reserva.origen} → ${reserva.destino}\n` +
+                      `📅 ${reserva.fecha_viaje}\n` +
+                      `💰 Total: ${reserva.total}\n\n` +
+                      `Te contactaremos pronto con los detalles de tu conductor.\n\n` +
+                      `¡Gracias por elegir OPA2 Transfers! 🌴`
+                    : `Hello ${reserva.nombre}! ✅\n\n` +
+                      `Your payment has been *confirmed* successfully.\n\n` +
+                      `📋 *Code:* ${codigo}\n` +
+                      `🚗 ${reserva.origen} → ${reserva.destino}\n` +
+                      `📅 ${reserva.fecha_viaje}\n` +
+                      `💰 Total: ${reserva.total}\n\n` +
+                      `We will contact you soon with your driver details.\n\n` +
+                      `Thank you for choosing OPA2 Transfers! 🌴`;
+                enviarWhatsApp(reserva.telefono, clientMsg);
+            }
         }
 
         res.json({ success: true });
