@@ -10,11 +10,6 @@ const CLIP_API_KEY = process.env.CLIP_API_KEY || '';
 const CLIP_SECRET_KEY = process.env.CLIP_SECRET_KEY || '';
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'playa2026*';
 
-// WhatsApp Cloud API (Meta Business)
-const WHATSAPP_TOKEN = process.env.WHATSAPP_TOKEN || '';
-const WHATSAPP_PHONE_ID = process.env.WHATSAPP_PHONE_ID || '';
-const ADMIN_WHATSAPP = process.env.ADMIN_WHATSAPP || '529842160298';
-
 // Supabase
 const supabase = createClient(
     process.env.SUPABASE_URL || '',
@@ -23,56 +18,6 @@ const supabase = createClient(
 
 app.use(express.json());
 app.use(express.static('.'));
-
-// Función para enviar WhatsApp via Meta Cloud API
-function enviarWhatsApp(telefono, mensaje) {
-    if (!WHATSAPP_TOKEN || !WHATSAPP_PHONE_ID) {
-        console.log('WhatsApp API no configurado - mensaje no enviado a:', telefono);
-        return;
-    }
-
-    // Limpiar número de teléfono (solo dígitos)
-    const phone = telefono.replace(/[^0-9]/g, '');
-    if (!phone || phone.length < 10) {
-        console.log('Número de teléfono inválido para WhatsApp:', telefono);
-        return;
-    }
-
-    const data = JSON.stringify({
-        messaging_product: 'whatsapp',
-        to: phone,
-        type: 'text',
-        text: { body: mensaje }
-    });
-
-    const req = https.request({
-        hostname: 'graph.facebook.com',
-        path: `/v21.0/${WHATSAPP_PHONE_ID}/messages`,
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${WHATSAPP_TOKEN}`,
-            'Content-Length': Buffer.byteLength(data)
-        }
-    }, (res) => {
-        let body = '';
-        res.on('data', chunk => body += chunk);
-        res.on('end', () => {
-            if (res.statusCode >= 200 && res.statusCode < 300) {
-                console.log('WhatsApp enviado a:', phone);
-            } else {
-                console.error('Error WhatsApp:', res.statusCode, body);
-            }
-        });
-    });
-
-    req.on('error', (err) => {
-        console.error('Error de red WhatsApp:', err.message);
-    });
-
-    req.write(data);
-    req.end();
-}
 
 // Helper: validar auth del admin
 function validarAdmin(req) {
@@ -310,59 +255,6 @@ app.post('/confirmar-pago', async (req, res) => {
             .eq('codigo', codigo);
 
         if (error) return res.status(500).json({ error: error.message });
-
-        // Obtener datos de la reserva para notificar al cliente
-        const { data: reserva } = await supabase
-            .from('reservas')
-            .select('*')
-            .eq('codigo', codigo)
-            .single();
-
-        if (reserva) {
-            // WhatsApp al admin: notificación de reserva pagada
-            const adminMsg = `🚐 *RESERVACIÓN PAGADA - OPA2*\n\n` +
-                `📋 *Código:* ${codigo}\n` +
-                `━━━━━━━━━━━━━━━━\n\n` +
-                `👤 *CLIENTE*\n` +
-                `Nombre: ${reserva.nombre}\n` +
-                `Email: ${reserva.email}\n` +
-                `Teléfono: ${reserva.telefono}\n` +
-                `Vuelo: ${reserva.vuelo || 'No especificado'}\n` +
-                `Notas: ${reserva.notas || 'Sin notas'}\n\n` +
-                `🚗 *SERVICIO*\n` +
-                `Tipo: ${reserva.servicio}\n` +
-                `Origen: ${reserva.origen}\n` +
-                `Destino: ${reserva.destino}\n` +
-                `Fecha: ${reserva.fecha_viaje}\n` +
-                `Pasajeros: ${reserva.pasajeros}\n` +
-                `Vehículo: ${reserva.vehiculo}\n\n` +
-                `💰 *Total:* ${reserva.total}\n` +
-                `✅ *Estado:* Pagado`;
-            enviarWhatsApp(ADMIN_WHATSAPP, adminMsg);
-
-            // WhatsApp al cliente: confirmación de pago
-            if (reserva.telefono) {
-                const lang = reserva.idioma || 'es';
-                const clientMsg = lang === 'es'
-                    ? `¡Hola ${reserva.nombre}! ✅\n\n` +
-                      `Tu pago ha sido *confirmado* exitosamente.\n\n` +
-                      `📋 *Código:* ${codigo}\n` +
-                      `🚗 ${reserva.origen} → ${reserva.destino}\n` +
-                      `📅 ${reserva.fecha_viaje}\n` +
-                      `💰 Total: ${reserva.total}\n\n` +
-                      `Te contactaremos pronto con los detalles de tu conductor.\n\n` +
-                      `¡Gracias por elegir OPA2 Transfers! 🌴`
-                    : `Hello ${reserva.nombre}! ✅\n\n` +
-                      `Your payment has been *confirmed* successfully.\n\n` +
-                      `📋 *Code:* ${codigo}\n` +
-                      `🚗 ${reserva.origen} → ${reserva.destino}\n` +
-                      `📅 ${reserva.fecha_viaje}\n` +
-                      `💰 Total: ${reserva.total}\n\n` +
-                      `We will contact you soon with your driver details.\n\n` +
-                      `Thank you for choosing OPA2 Transfers! 🌴`;
-                enviarWhatsApp(reserva.telefono, clientMsg);
-            }
-        }
 
         res.json({ success: true });
     } catch (error) {
