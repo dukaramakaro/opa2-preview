@@ -1698,8 +1698,7 @@
                 'VALLADOLID': { van10: 3500, van20: 5200, luxury: 5000, nombre: 'Valladolid' },
                 'BACALAR': { van10: 8000, van20: 17000, luxury: 13500, nombre: 'Bacalar' },
                 'HOLBOX': { van10: 3900, van20: 6240, luxury: 6090, nombre: 'Holbox' },
-                'EL_CUYO': { van10: 3500, van20: 5800, luxury: 5500, nombre: 'El Cuyo' },
-                'TEST_CLIP': { van10: 10, van20: 10, luxury: 10, nombre: '⚠️ PRUEBA CLIP (Eliminar)' }
+                'EL_CUYO': { van10: 3500, van20: 5800, luxury: 5500, nombre: 'El Cuyo' }
             },
             // Desde Aeropuerto Tulum (TQO)
             'TULUM_AIRPORT': {
@@ -2651,83 +2650,6 @@
             originalShowModal(modalId);
         };
         
-        function submitReservation() {
-            // Validar campos
-            var name = document.getElementById('client-name').value.trim();
-            var email = document.getElementById('client-email').value.trim();
-            var phone = document.getElementById('client-phone').value.trim();
-            var flight = document.getElementById('client-flight').value.trim();
-            var notes = document.getElementById('client-notes').value.trim();
-            
-            if (!name || !email || !phone) {
-                alert(currentLang === 'es' ? 'Por favor completa nombre, email y teléfono' : 'Please fill in name, email and phone');
-                return;
-            }
-            
-            // Validar email básico
-            if (!email.includes('@') || !email.includes('.')) {
-                alert(currentLang === 'es' ? 'Por favor ingresa un email válido' : 'Please enter a valid email');
-                return;
-            }
-            
-            // Preparar datos completos
-            var fullData = {
-                // Datos del cliente
-                nombre: name,
-                email: email,
-                telefono: phone,
-                vuelo: flight || 'No especificado',
-                notas: notes || 'Sin notas',
-                // Datos de la reservación
-                codigo: reservationData.codigo,
-                servicio: reservationData.servicio,
-                origen: reservationData.origen,
-                destino: reservationData.destino,
-                fecha: reservationData.fecha,
-                pasajeros: reservationData.pasajeros,
-                vehiculo: reservationData.vehiculo,
-                total: reservationData.total,
-                // Metadata
-                idioma: currentLang,
-                fechaSolicitud: new Date().toLocaleString('es-MX')
-            };
-            
-            // Mostrar loading
-            var submitBtn = document.querySelector('#modal-details .modal-btn.primary');
-            var originalText = submitBtn.innerText;
-            submitBtn.innerText = currentLang === 'es' ? 'Enviando...' : 'Sending...';
-            submitBtn.disabled = true;
-            
-            // Enviar por EmailJS (si está configurado) + WhatsApp como respaldo
-            sendReservationEmail(fullData, function(success) {
-                // Guardar en base de datos CSV
-                fetch('/guardar-reserva', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        ...fullData,
-                        estado: 'Pendiente'
-                    })
-                }).then(function() {
-                    console.log('Reserva guardada en CSV');
-                }).catch(function(err) {
-                    console.error('Error guardando en CSV:', err);
-                });
-                
-                submitBtn.innerText = originalText;
-                submitBtn.disabled = false;
-                
-                if (success) {
-                    showModal('modal-confirm');
-                } else {
-                    // Fallback: Abrir WhatsApp
-                    var whatsappMsg = generarMensajeWhatsApp(fullData);
-                    window.open('https://wa.me/529842160298?text=' + encodeURIComponent(whatsappMsg), '_blank');
-                    showModal('modal-confirm');
-                }
-            });
-        }
-        
         function sendReservationEmail(data, callback) {
             // Inicializar EmailJS
             if (typeof emailjs !== 'undefined') {
@@ -2765,6 +2687,36 @@
             });
         }
         
+        function sendClientConfirmationEmail(data) {
+            if (typeof emailjs === 'undefined') {
+                console.log('EmailJS no cargado, no se puede enviar email al cliente');
+                return;
+            }
+            emailjs.init('Od_x7excGF1h9o6gM');
+            emailjs.send('service_7azvg4g', 'template_6k2clag', {
+                to_email: data.email,
+                from_name: 'OPA2 Transfers',
+                from_email: 'soporteopa2@gmail.com',
+                phone: data.telefono,
+                flight: data.vuelo,
+                notes: data.notas,
+                booking_code: data.codigo,
+                service: data.servicio,
+                origin: data.origen,
+                destination: data.destino,
+                date: data.fecha,
+                passengers: data.pasajeros,
+                vehicle: data.vehiculo,
+                total: data.total,
+                language: data.idioma,
+                request_date: data.fechaSolicitud
+            }).then(function() {
+                console.log('Email de confirmación enviado al cliente:', data.email);
+            }).catch(function(error) {
+                console.log('Error enviando email al cliente:', error);
+            });
+        }
+
         function generarMensajeWhatsApp(data) {
             var msg = '🚐 *NUEVA RESERVACIÓN OPA2*\n\n';
             msg += '📋 *Código:* ' + data.codigo + '\n';
@@ -2840,8 +2792,11 @@
                 fechaSolicitud: new Date().toLocaleString('es-MX')
             };
             
-            // Enviar notificación
+            // Enviar email al admin
             sendReservationEmail(fullData, function() {});
+
+            // Enviar email de confirmación al cliente
+            sendClientConfirmationEmail(fullData);
             
             // Guardar en CSV
             fetch('/guardar-reserva', {

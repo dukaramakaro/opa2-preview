@@ -57,6 +57,7 @@ app.post('/guardar-reserva', async (req, res) => {
             console.error('Error Supabase insert:', error);
             return res.status(500).json({ error: error.message });
         }
+
         res.json({ success: true });
     } catch (error) {
         console.error('Error guardando reserva:', error);
@@ -254,6 +255,7 @@ app.post('/confirmar-pago', async (req, res) => {
             .eq('codigo', codigo);
 
         if (error) return res.status(500).json({ error: error.message });
+
         res.json({ success: true });
     } catch (error) {
         console.error('Error confirmando pago:', error);
