@@ -367,6 +367,23 @@ app.get('/consultar-reserva/:codigo', async (req, res) => {
     }
 });
 
+// Health check / keep-alive para evitar que el servidor se duerma
+app.get('/ping', async (req, res) => {
+    try {
+        const { count, error } = await supabase
+            .from('reservas')
+            .select('*', { count: 'exact', head: true });
+
+        if (error) {
+            return res.status(500).json({ status: 'error', db: error.message });
+        }
+
+        res.json({ status: 'ok', db: 'connected', reservas: count });
+    } catch (error) {
+        res.status(500).json({ status: 'error', message: error.message });
+    }
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Servidor OPA2 corriendo en puerto ${PORT}`);
