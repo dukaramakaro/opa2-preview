@@ -36,21 +36,20 @@ app.post('/guardar-reserva', async (req, res) => {
     try {
         const data = req.body;
         const { error } = await supabase.from('reservas').insert({
-            codigo: data.codigo || null,
-            nombre: data.nombre || '',
-            email: data.email || '',
-            telefono: data.telefono || '',
-            vuelo: data.vuelo || '',
-            servicio: data.servicio || '',
-            origen: data.origen || '',
-            destino: data.destino || '',
-            fecha_viaje: data.fecha || '',
-            pasajeros: data.pasajeros || '',
-            vehiculo: data.vehiculo || '',
-            total: data.total || '',
-            estado: data.estado || 'Pendiente',
-            notas: data.notas || '',
-            idioma: data.idioma || 'es'
+            Codigo: data.codigo || null,
+            Nombre: data.nombre || '',
+            Email: data.email || '',
+            Telefono: data.telefono || '',
+            Vuelo: data.vuelo || '',
+            Servicio: data.servicio || '',
+            Origen: data.origen || '',
+            Destino: data.destino || '',
+            FechaViaje: data.fecha || '',
+            Pasajeros: data.pasajeros || '',
+            Vehiculo: data.vehiculo || '',
+            Total: data.total || '',
+            Estado: data.estado || 'Pendiente',
+            Notas: data.notas || ''
         });
 
         if (error) {
@@ -181,29 +180,11 @@ app.get('/admin/reservas', async (req, res) => {
         const { data, error } = await supabase
             .from('reservas')
             .select('*')
-            .order('created_at', { ascending: false });
+            .order('Fecha', { ascending: false });
 
         if (error) return res.status(500).json({ error: error.message });
 
-        const reservas = (data || []).map(r => ({
-            Fecha: r.created_at,
-            Codigo: r.codigo,
-            Nombre: r.nombre,
-            Email: r.email,
-            Telefono: r.telefono,
-            Vuelo: r.vuelo,
-            Servicio: r.servicio,
-            Origen: r.origen,
-            Destino: r.destino,
-            FechaViaje: r.fecha_viaje,
-            Pasajeros: r.pasajeros,
-            Vehiculo: r.vehiculo,
-            Total: r.total,
-            Estado: r.estado,
-            Notas: r.notas
-        }));
-
-        res.json({ reservas });
+        res.json({ reservas: data || [] });
     } catch (error) {
         console.error('Error leyendo reservas:', error);
         res.status(500).json({ error: error.message });
@@ -226,15 +207,15 @@ app.get('/admin/descargar', async (req, res) => {
     const { data, error } = await supabase
         .from('reservas')
         .select('*')
-        .order('created_at', { ascending: false });
+        .order('Fecha', { ascending: false });
 
     if (error) return res.status(500).json({ error: error.message });
 
     const headers = 'Fecha,Codigo,Nombre,Email,Telefono,Vuelo,Servicio,Origen,Destino,FechaViaje,Pasajeros,Vehiculo,Total,Estado,Notas';
     const rows = (data || []).map(r => [
-        r.created_at, r.codigo, r.nombre, r.email, r.telefono, r.vuelo,
-        r.servicio, r.origen, r.destino, r.fecha_viaje, r.pasajeros,
-        r.vehiculo, r.total, r.estado, r.notas
+        r.Fecha, r.Codigo, r.Nombre, r.Email, r.Telefono, r.Vuelo,
+        r.Servicio, r.Origen, r.Destino, r.FechaViaje, r.Pasajeros,
+        r.Vehiculo, r.Total, r.Estado, r.Notas
     ].map(f => `"${(f || '').toString().replace(/"/g, '""')}"`).join(','));
 
     const csv = [headers, ...rows].join('\n');
@@ -251,8 +232,8 @@ app.post('/confirmar-pago', async (req, res) => {
     try {
         const { error } = await supabase
             .from('reservas')
-            .update({ estado: 'Pagado' })
-            .eq('codigo', codigo);
+            .update({ Estado: 'Pagado' })
+            .eq('Codigo', codigo);
 
         if (error) return res.status(500).json({ error: error.message });
 
@@ -273,8 +254,8 @@ app.post('/admin/actualizar-estado', async (req, res) => {
     try {
         const { error } = await supabase
             .from('reservas')
-            .update({ estado })
-            .eq('codigo', codigo);
+            .update({ Estado: estado })
+            .eq('Codigo', codigo);
 
         if (error) return res.status(500).json({ error: error.message });
         res.json({ success: true });
@@ -292,20 +273,20 @@ app.post('/admin/nueva-reserva', async (req, res) => {
 
     try {
         const { error } = await supabase.from('reservas').insert({
-            codigo: codigo,
-            nombre: data.nombre || '',
-            email: data.email || '',
-            telefono: data.telefono || '',
-            vuelo: data.vuelo || '',
-            servicio: data.servicio || '',
-            origen: data.origen || '',
-            destino: data.destino || '',
-            fecha_viaje: data.fecha_viaje || '',
-            pasajeros: data.pasajeros || '',
-            vehiculo: data.vehiculo || '',
-            total: data.total || '',
-            estado: data.estado || 'Pendiente',
-            notas: data.notas || ''
+            Codigo: codigo,
+            Nombre: data.nombre || '',
+            Email: data.email || '',
+            Telefono: data.telefono || '',
+            Vuelo: data.vuelo || '',
+            Servicio: data.servicio || '',
+            Origen: data.origen || '',
+            Destino: data.destino || '',
+            FechaViaje: data.fecha_viaje || '',
+            Pasajeros: data.pasajeros || '',
+            Vehiculo: data.vehiculo || '',
+            Total: data.total || '',
+            Estado: data.estado || 'Pendiente',
+            Notas: data.notas || ''
         });
 
         if (error) return res.status(500).json({ error: error.message });
@@ -326,7 +307,7 @@ app.delete('/admin/eliminar-reserva/:codigo', async (req, res) => {
         const { error } = await supabase
             .from('reservas')
             .delete()
-            .eq('codigo', codigo);
+            .eq('Codigo', codigo);
 
         if (error) return res.status(500).json({ error: error.message });
         res.json({ success: true });
@@ -343,24 +324,24 @@ app.get('/consultar-reserva/:codigo', async (req, res) => {
     try {
         const { data, error } = await supabase
             .from('reservas')
-            .select('codigo, nombre, servicio, origen, destino, fecha_viaje, pasajeros, vehiculo, total, estado, created_at')
-            .eq('codigo', codigo)
+            .select('Codigo, Nombre, Servicio, Origen, Destino, FechaViaje, Pasajeros, Vehiculo, Total, Estado, Fecha')
+            .eq('Codigo', codigo)
             .single();
 
         if (error || !data) return res.status(404).json({ error: 'Reserva no encontrada' });
 
         res.json({
-            codigo: data.codigo,
-            nombre: data.nombre,
-            servicio: data.servicio,
-            origen: data.origen,
-            destino: data.destino,
-            fecha_viaje: data.fecha_viaje,
-            pasajeros: data.pasajeros,
-            vehiculo: data.vehiculo,
-            total: data.total,
-            estado: data.estado,
-            created_at: data.created_at
+            codigo: data.Codigo,
+            nombre: data.Nombre,
+            servicio: data.Servicio,
+            origen: data.Origen,
+            destino: data.Destino,
+            fecha_viaje: data.FechaViaje,
+            pasajeros: data.Pasajeros,
+            vehiculo: data.Vehiculo,
+            total: data.Total,
+            estado: data.Estado,
+            created_at: data.Fecha
         });
     } catch (error) {
         res.status(500).json({ error: error.message });
